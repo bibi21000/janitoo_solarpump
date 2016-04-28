@@ -55,14 +55,14 @@ COMMAND_DISCOVERY = 0x5000
 assert(COMMAND_DESC[COMMAND_DISCOVERY] == 'COMMAND_DISCOVERY')
 ##############################################################
 
-class TestPiSerser(JNTTServer, JNTTServerCommon):
+class TestLapinooServerSerser(JNTTServer, JNTTServerCommon):
     """Test the pi server
     """
     loglevel = logging.DEBUG
     path = '/tmp/janitoo_test'
     broker_user = 'toto'
     broker_password = 'toto'
-    server_class = FishtankServer
+    server_class = LapinooServer
     server_conf = "tests/data/janitoo_lapinoo.conf"
 
     hadds = [HADD%(222,0), HADD%(222,1)]

@@ -38,6 +38,8 @@ from janitoo.value import JNTValue
 from janitoo.component import JNTComponent
 from janitoo.bus import JNTBus
 
+from janitoo_raspberry_sound.sound import SoundBus
+from janitoo_raspberry_sound.sound import InputComponent as SoundInput
 from janitoo_raspberry_camera.camera import CameraBus
 from janitoo_raspberry_camera.camera import CameraPhoto, CameraVideo, CameraStream
 from janitoo_raspberry_dht.dht import DHTComponent
@@ -299,7 +301,7 @@ class VideoStreamComponent(CameraStream):
                 **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
-class AudioStreamComponent(CameraStream):
+class AudioStreamComponent(SoundInput):
     """ An audio stream component """
 
     def __init__(self, bus=None, addr=None, **kwargs):
@@ -307,7 +309,7 @@ class AudioStreamComponent(CameraStream):
         """
         oid = kwargs.pop('oid', 'lapinoo.audiostream')
         name = kwargs.pop('name', "Audio stream")
-        CameraStream.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+        SoundInput.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
                 **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
