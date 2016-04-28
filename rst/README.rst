@@ -1,3 +1,4 @@
+
 .. image:: https://travis-ci.org/bibi21000/janitoo_lapinoo.svg?branch=master
     :target: https://travis-ci.org/bibi21000/janitoo_lapinoo
     :alt: Travis status
