@@ -45,7 +45,7 @@ from janitoo.utils import TOPIC_NODES, TOPIC_NODES_REPLY, TOPIC_NODES_REQUEST
 from janitoo.utils import TOPIC_BROADCAST_REPLY, TOPIC_BROADCAST_REQUEST
 from janitoo.utils import TOPIC_VALUES_USER, TOPIC_VALUES_CONFIG, TOPIC_VALUES_SYSTEM, TOPIC_VALUES_BASIC
 
-import janitoo_raspberry_1wire.bus_1wire
+import janitoo_raspberry_sound.sound
 
 ##############################################################
 #Check that we are in sync with the official command classes
@@ -57,7 +57,7 @@ COMMAND_DISCOVERY = 0x5000
 assert(COMMAND_DESC[COMMAND_DISCOVERY] == 'COMMAND_DISCOVERY')
 ##############################################################
 
-class TestFishtankThread(JNTTThreadRun, JNTTThreadRunCommon):
+class TestLapinooThread(JNTTThreadRun, JNTTThreadRunCommon):
     """Test the datarrd thread
     """
     thread_name = "lapinoo"

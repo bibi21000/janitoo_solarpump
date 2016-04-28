@@ -77,3 +77,33 @@ class TestProximityComponent(JNTTComponent, JNTTComponentCommon):
     """Test the component
     """
     component_name = "lapinoo.proximity"
+
+class TestRfidComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "lapinoo.rfid"
+
+class TestRTCComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "lapinoo.rtc"
+
+class TestPhotoComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "lapinoo.photo"
+
+class TestVideoComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "lapinoo.video"
+
+class TestVideoStreamComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "lapinoo.videostream"
+
+class TestAudioStreamComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "lapinoo.audiostream"

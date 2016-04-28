@@ -41,7 +41,7 @@ from janitoo.runner import Runner, jnt_parse_args
 from janitoo.server import JNTServer
 from janitoo.utils import HADD_SEP, HADD
 
-from janitoo_lapinoo.server import FishtankServer
+from janitoo_lapinoo.server import LapinooServer
 
 class TestRaspberryFishtankSerser(JNTTDockerServer, JNTTDockerServerCommon):
     """Test the server
