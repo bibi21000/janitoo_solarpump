@@ -38,13 +38,15 @@ from janitoo.value import JNTValue
 from janitoo.component import JNTComponent
 from janitoo.bus import JNTBus
 
+from janitoo_raspberry_camera.camera import CameraBus
+from janitoo_raspberry_camera.camera import CameraPhoto, CameraVideo, CameraStream
 from janitoo_raspberry_dht.dht import DHTComponent
 from janitoo_raspberry_spi.bus_spi import SPIBus
-from janitoo_raspberry_i2c.bus_i2c import I2CBus
-from janitoo_raspberry_i2c_vcnl40xx.vcnl40xx import VCLN4010Component
-#~ from janitoo_raspberry_camera.camera import CameraBus
 from janitoo_raspberry_spi_ili9341.ili9341 import ScreenComponent as IliScreenComponent
 from janitoo_raspberry_spi_pn532.pn532 import PN532Component
+from janitoo_raspberry_i2c.bus_i2c import I2CBus
+from janitoo_raspberry_i2c_vcnl40xx.vcnl40xx import VCLN4010Component
+from janitoo_raspberry_i2c_ds1307.ds1307 import DS1307Component
 from janitoo_raspberry_gpio.gpio import GpioBus, OutputComponent, RGBComponent
 
 ##############################################################
@@ -73,6 +75,24 @@ def make_led(**kwargs):
 def make_proximity(**kwargs):
     return ProximityComponent(**kwargs)
 
+def make_rfid(**kwargs):
+    return RfidComponent(**kwargs)
+
+def make_rtc(**kwargs):
+    return RtcComponent(**kwargs)
+
+def make_photo(**kwargs):
+    return PhotoComponent(**kwargs)
+
+def make_video(**kwargs):
+    return VideoComponent(**kwargs)
+
+def make_videostream(**kwargs):
+    return VideoStreamComponent(**kwargs)
+
+def make_audiostream(**kwargs):
+    return AudioStreamComponent(**kwargs)
+
 class LapinooBus(JNTBus):
     """A bus to manage Lapinoo
     """
@@ -81,6 +101,7 @@ class LapinooBus(JNTBus):
         """
         JNTBus.__init__(self, **kwargs)
         self.buses = {}
+        self.buses['camera'] = CameraBus(masters=[self], **kwargs)
         self.buses['gpiobus'] = GpioBus(masters=[self], **kwargs)
         self.buses['spibus'] = SPIBus(masters=[self], **kwargs)
         self.buses['i2cbus'] = I2CBus(masters=[self], **kwargs)
@@ -207,6 +228,18 @@ class ProximityComponent(VCLN4010Component):
                 **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
+class RtcComponent(VCLN4010Component):
+    """ A component for RTC """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', 'lapinoo.rtc')
+        name = kwargs.pop('name', "RTC clock")
+        DS1307Component.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
 class LedComponent(RGBComponent):
     """ A component for a RGB Led (PWM) """
 
@@ -218,7 +251,6 @@ class LedComponent(RGBComponent):
         RGBComponent.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
                 **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
-
 
 class ScreenComponent(IliScreenComponent):
     """ A timelapse component """
@@ -232,7 +264,62 @@ class ScreenComponent(IliScreenComponent):
                 **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
-    def check_heartbeat(self):
-        """Check that the component is 'available'
+class PhotoComponent(CameraPhoto):
+    """ A timelapse component """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
         """
-        return True
+        """
+        oid = kwargs.pop('oid', 'lapinoo.photo')
+        name = kwargs.pop('name', "Photo")
+        CameraPhoto.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+class VideoComponent(CameraVideo):
+    """ A timelapse component """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', 'lapinoo.video')
+        name = kwargs.pop('name', "Video recorder")
+        CameraVideo.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+class VideoStreamComponent(CameraStream):
+    """ A video stream component """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', 'lapinoo.videostream')
+        name = kwargs.pop('name', "Video stream")
+        CameraStream.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+class AudioStreamComponent(CameraStream):
+    """ An audio stream component """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', 'lapinoo.audiostream')
+        name = kwargs.pop('name', "Audio stream")
+        CameraStream.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+class RfidComponent(PN532Component):
+    """ An RFID component """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', 'lapinoo.rfid')
+        name = kwargs.pop('name', "RFID reader/writer")
+        PN532Component.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)

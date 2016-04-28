@@ -54,31 +54,6 @@ def data_files_config(res, rsrc, src, pattern):
 data_files = []
 data_files_config(data_files, 'docs','src/docs/','*')
 
-#You must define a variable like the one below.
-#It will be used to collect entries without installing the package
-janitoo_entry_points = {
-    "janitoo.threads": [
-        "lapinoo = janitoo_lapinoo.thread_lapinoo:make_thread",
-    ],
-    "janitoo.components": [
-        "lapinoo.ambiance = janitoo_lapinoo.lapinoo:make_ambiance",
-        "lapinoo.temperature = janitoo_lapinoo.lapinoo:make_temperature",
-        "lapinoo.screen = janitoo_lapinoo.lapinoo:make_screen",
-    ],
-        #~ "lapinoo.moon = janitoo_lapinoo.lapinoo:make_moon",
-        #~ "lapinoo.sun = janitoo_lapinoo.lapinoo:make_sun",
-        #~ "lapinoo.tide = janitoo_lapinoo.lapinoo:make_tide",
-        #~ "lapinoo.airflow = janitoo_lapinoo.lapinoo:make_airflow",
-        #~ "lapinoo.timelapse = janitoo_lapinoo.lapinoo:make_timelapse",
-        #~ "lapinoo.remote_node = janitoo_lapinoo.lapinoo:make_remote_node",
-        #~ "lapinoo.thermostat = janitoo_lapinoo.lapinoo:make_thermostat",
-        #~ "lapinoo.switch_fullsun = janitoo_lapinoo.lapinoo:make_switch_fullsun",
-        #~ "lapinoo.dcmotor = janitoo_lapinoo.lapinoo:make_dcmotor",
-        #~ "lapinoo.led = janitoo_lapinoo.lapinoo:make_led",
-        #~ "lapinoo.pir = janitoo_lapinoo.lapinoo:make_pir",
-        #~ "lapinoo.sonic = janitoo_lapinoo.lapinoo:make_sonic",
-}
-
 setup(
     name = 'janitoo_lapinoo',
     description = "A server which handle many controller (hardware, onewire, i2c, ...) dedicated to the raspberry",
@@ -113,12 +88,16 @@ setup(
     install_requires=[
                      'janitoo',
                      'janitoo_factory',
+                     'janitoo_events',
+                     'janitoo_events_cron',
                      'janitoo_raspberry',
+                     'janitoo_raspberry_camera',
+                     'janitoo_raspberry_sound',
+                     'janitoo_raspberry_gpio',
                      'janitoo_raspberry_dht',
                      'janitoo_raspberry_i2c',
+                     'janitoo_raspberry_i2c_ds1307',
                      'janitoo_raspberry_i2c_vcnl40xx',
-                     'janitoo_raspberry_gpio',
-                     'janitoo_raspberry_camera',
                      'janitoo_raspberry_spi',
                      'janitoo_raspberry_spi_ili9341',
                      'janitoo_raspberry_spi_pn532',
@@ -126,15 +105,32 @@ setup(
     dependency_links = [
       'https://github.com/bibi21000/janitoo/archive/master.zip#egg=janitoo',
       'https://github.com/bibi21000/janitoo_factory/archive/master.zip#egg=janitoo_factory',
+      'https://github.com/bibi21000/janitoo_events/archive/master.zip#egg=janitoo_events',
+      'https://github.com/bibi21000/janitoo_events_cron/archive/master.zip#egg=janitoo_events_cron',
       'https://github.com/bibi21000/janitoo_raspberry/archive/master.zip#egg=janitoo_raspberry',
-      'https://github.com/bibi21000/janitoo_raspberry_dht/archive/master.zip#egg=janitoo_raspberry_dht',
-      'https://github.com/bibi21000/janitoo_raspberry_i2c/archive/master.zip#egg=janitoo_raspberry_i2c',
-      'https://github.com/bibi21000/janitoo_raspberry_i2c_vcnl40xx/archive/master.zip#egg=janitoo_raspberry_i2c_vcnl40xx',
-      'https://github.com/bibi21000/janitoo_raspberry_gpio/archive/master.zip#egg=janitoo_raspberry_gpio',
+      'https://github.com/bibi21000/janitoo_raspberry_sound/archive/master.zip#egg=janitoo_raspberry_sound',
       'https://github.com/bibi21000/janitoo_raspberry_camera/archive/master.zip#egg=janitoo_raspberry_camera',
+      'https://github.com/bibi21000/janitoo_raspberry_dht/archive/master.zip#egg=janitoo_raspberry_dht',
+      'https://github.com/bibi21000/janitoo_raspberry_gpio/archive/master.zip#egg=janitoo_raspberry_gpio',
+      'https://github.com/bibi21000/janitoo_raspberry_i2c/archive/master.zip#egg=janitoo_raspberry_i2c',
+      'https://github.com/bibi21000/janitoo_raspberry_i2c_ds1307/archive/master.zip#egg=janitoo_raspberry_i2c_ds1307',
+      'https://github.com/bibi21000/janitoo_raspberry_i2c_vcnl40xx/archive/master.zip#egg=janitoo_raspberry_i2c_vcnl40xx',
       'https://github.com/bibi21000/janitoo_raspberry_spi/archive/master.zip#egg=janitoo_raspberry_spi',
       'https://github.com/bibi21000/janitoo_raspberry_spi_ili9341/archive/master.zip#egg=janitoo_raspberry_spi_ili9341',
       'https://github.com/bibi21000/janitoo_raspberry_spi_pn532/archive/master.zip#egg=janitoo_raspberry_spi_pn532',
     ],
-    entry_points = janitoo_entry_points,
+    entry_points = {
+        "janitoo.threads": [
+            "lapinoo = janitoo_lapinoo.thread_lapinoo:make_thread",
+        ],
+        "janitoo.components": [
+            "lapinoo.ambiance = janitoo_lapinoo.lapinoo:make_ambiance",
+            "lapinoo.screen = janitoo_lapinoo.lapinoo:make_screen",
+            "lapinoo.rtc = janitoo_lapinoo.lapinoo:make_rtc",
+            "lapinoo.photo = janitoo_lapinoo.lapinoo:make_photo",
+            "lapinoo.video = janitoo_lapinoo.lapinoo:make_video",
+            "lapinoo.videostream = janitoo_lapinoo.lapinoo:make_videostream",
+            "lapinoo.audiostream = janitoo_lapinoo.lapinoo:make_audiostream",
+        ],
+    },
 )
