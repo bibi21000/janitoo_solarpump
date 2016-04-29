@@ -229,7 +229,7 @@ class ProximityComponent(VCLN4010Component):
                 **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
-class RtcComponent(VCLN4010Component):
+class RtcComponent(DS1307Component):
     """ A component for RTC """
 
     def __init__(self, bus=None, addr=None, **kwargs):
