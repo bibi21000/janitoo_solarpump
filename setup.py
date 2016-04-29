@@ -126,6 +126,8 @@ setup(
         "janitoo.components": [
             "lapinoo.ambiance = janitoo_lapinoo.lapinoo:make_ambiance",
             "lapinoo.screen = janitoo_lapinoo.lapinoo:make_screen",
+            "lapinoo.rfid = janitoo_lapinoo.lapinoo:make_rfid",
+            "lapinoo.proximity = janitoo_lapinoo.lapinoo:make_proximity",
             "lapinoo.rtc = janitoo_lapinoo.lapinoo:make_rtc",
             "lapinoo.photo = janitoo_lapinoo.lapinoo:make_photo",
             "lapinoo.video = janitoo_lapinoo.lapinoo:make_video",
