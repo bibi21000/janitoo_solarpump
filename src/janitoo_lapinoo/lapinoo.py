@@ -223,7 +223,7 @@ class ProximityComponent(VCLN4010Component):
     def __init__(self, bus=None, addr=None, **kwargs):
         """
         """
-        oid = kwargs.pop('oid', 'lapinoo.dcmotor')
+        oid = kwargs.pop('oid', 'lapinoo.proximity')
         name = kwargs.pop('name', "Proximity sensor")
         VCLN4010Component.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
                 **kwargs)
