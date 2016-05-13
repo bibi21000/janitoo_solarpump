@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""The Raspberry lapinoo
-
+"""The Raspberry server
 """
 
 __license__ = """
@@ -24,44 +23,35 @@ __author__ = 'Sébastien GALLET aka bibi21000'
 __email__ = 'bibi21000@gmail.com'
 __copyright__ = "Copyright © 2013-2014-2015-2016 Sébastien GALLET aka bibi21000"
 
+import platform
+
 # Set default logging handler to avoid "No handler found" warnings.
 import logging
 logger = logging.getLogger(__name__)
 import os, sys
 import threading
-import time
-import datetime
-import socket
-from janitoo.thread import JNTBusThread
-from janitoo.bus import JNTBus
-from janitoo.component import JNTComponent
-from janitoo.thread import BaseThread
-from janitoo.options import get_option_autostart
+from pkg_resources import get_distribution, DistributionNotFound
+from janitoo.mqtt import MQTTClient
+from janitoo.server import JNTServer, JNTControllerManager
+from janitoo.utils import JanitooException
+from janitoo_raspberry.server import PiServer
 
 ##############################################################
 #Check that we are in sync with the official command classes
 #Must be implemented for non-regression
 from janitoo.classes import COMMAND_DESC
 
+COMMAND_UPDATE = 0x1040
 COMMAND_CONTROLLER = 0x1050
+COMMAND_DISCOVERY = 0x5000
 
+assert(COMMAND_DESC[COMMAND_DISCOVERY] == 'COMMAND_DISCOVERY')
 assert(COMMAND_DESC[COMMAND_CONTROLLER] == 'COMMAND_CONTROLLER')
+assert(COMMAND_DESC[COMMAND_UPDATE] == 'COMMAND_UPDATE')
 ##############################################################
 
-def make_thread(options):
-    if get_option_autostart(options, 'lapinoo') == True:
-        return LapinooThread(options)
-    else:
-        return None
-
-class LapinooThread(JNTBusThread):
-    """The basic thread
+class RantanplanServer(PiServer):
+    """The Raspberry pi Server
 
     """
-    def init_bus(self):
-        """Build the bus
-        """
-        from janitoo_lapinoo.lapinoo import LapinooBus
-        self.section = 'lapinoo'
-        self.bus = LapinooBus(options=self.options, oid=self.section, product_name="Raspberry lapinoo controller")
-
+    pass

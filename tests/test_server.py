@@ -42,8 +42,9 @@ from janitoo.utils import TOPIC_HEARTBEAT, NETWORK_REQUESTS
 from janitoo.utils import TOPIC_NODES, TOPIC_NODES_REPLY, TOPIC_NODES_REQUEST
 from janitoo.utils import TOPIC_BROADCAST_REPLY, TOPIC_BROADCAST_REQUEST
 from janitoo.utils import TOPIC_VALUES_USER, TOPIC_VALUES_CONFIG, TOPIC_VALUES_SYSTEM, TOPIC_VALUES_BASIC
+from janitoo.thread import JNTBusThread
 
-from janitoo_lapinoo.server import LapinooServer
+from janitoo_rantanplan.server import RantanplanServer
 
 ##############################################################
 #Check that we are in sync with the official command classes
@@ -55,20 +56,18 @@ COMMAND_DISCOVERY = 0x5000
 assert(COMMAND_DESC[COMMAND_DISCOVERY] == 'COMMAND_DISCOVERY')
 ##############################################################
 
-class TestLapinooServerSerser(JNTTServer, JNTTServerCommon):
+class TestRantanplanServer(JNTTServer, JNTTServerCommon):
     """Test the pi server
     """
     loglevel = logging.DEBUG
     path = '/tmp/janitoo_test'
     broker_user = 'toto'
     broker_password = 'toto'
-    server_class = LapinooServer
-    server_conf = "tests/data/janitoo_lapinoo.conf"
+    server_class = RantanplanServer
+    server_conf = "tests/data/janitoo_rantanplan.conf"
+    server_section = "rantanplan"
 
-    hadds = [HADD%(222,0), HADD%(222,1)]
-    #~ hadds = [HADD%(222,0), HADD%(222,1), HADD%(222,2), HADD%(222,3),
-             #~ HADD%(222,4), HADD%(222,5), HADD%(222,6), HADD%(222,7), HADD%(222,8), HADD%(222,9),
-             #~ HADD%(222,10), HADD%(222,11)]
+    hadds = [HADD%(222,0), HADD%(222,1), HADD%(222,2), HADD%(222,3), HADD%(222,4), HADD%(222,5), HADD%(222,6)]
 
     def test_011_start_reload_stop(self):
         self.skipRasperryTest()
@@ -82,6 +81,27 @@ class TestLapinooServerSerser(JNTTServer, JNTTServerCommon):
         self.skipRasperryTest()
         JNTTServerCommon.test_030_wait_for_all_nodes(self)
 
-    def test_040_server_start_no_error_in_log(self):
-        self.onlyRasperryTest()
-        JNTTServerCommon.test_040_server_start_no_error_in_log(self)
+    def test_100_server_start_machine_state(self):
+        self.start()
+        time.sleep(10)
+        thread = self.server.find_thread(self.server_section)
+        self.assertNotEqual(thread, None)
+        self.assertIsInstance(thread, JNTBusThread)
+        bus = thread.bus
+        self.assertNotEqual(bus, None)
+        self.waitHeartbeatNodes(hadds=self.hadds)
+        bus.guard()
+        time.sleep(5)
+        bus.report()
+        time.sleep(5)
+        bus.guard()
+        time.sleep(5)
+        bus.bark()
+        time.sleep(5)
+        bus.guard()
+        time.sleep(5)
+        bus.bark()
+        time.sleep(5)
+        bus.bite()
+        time.sleep(5)
+        bus.sleep()

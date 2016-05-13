@@ -55,7 +55,7 @@ data_files = []
 data_files_config(data_files, 'docs','src/docs/','*')
 
 setup(
-    name = 'janitoo_lapinoo',
+    name = 'janitoo_rantanplan',
     description = "A server which handle many controller (hardware, onewire, i2c, ...) dedicated to the raspberry",
     long_description = "A server which handle many controller (hardware, onewire, i2c, ...) dedicated to the raspberry",
     author='Sébastien GALLET aka bibi2100 <bibi21000@gmail.com>',
@@ -79,7 +79,7 @@ setup(
     """,
     version = janitoo_version,
     zip_safe = False,
-    scripts=['src/scripts/jnt_lapinoo'],
+    scripts=['src/scripts/jnt_rantanplan'],
     packages = find_packages('src', exclude=["scripts", "docs", "config"]),
     package_dir = { '': 'src' },
     keywords = "raspberry",
@@ -101,6 +101,9 @@ setup(
                      'janitoo_raspberry_spi',
                      'janitoo_raspberry_spi_ili9341',
                      'janitoo_raspberry_spi_pn532',
+                     'janitoo_hostsensor',
+                     'janitoo_hostsensor_raspberry',
+                     'janitoo_raspberry_1wire',
                     ],
     dependency_links = [
       'https://github.com/bibi21000/janitoo/archive/master.zip#egg=janitoo',
@@ -110,6 +113,7 @@ setup(
       'https://github.com/bibi21000/janitoo_raspberry/archive/master.zip#egg=janitoo_raspberry',
       'https://github.com/bibi21000/janitoo_raspberry_sound/archive/master.zip#egg=janitoo_raspberry_sound',
       'https://github.com/bibi21000/janitoo_raspberry_camera/archive/master.zip#egg=janitoo_raspberry_camera',
+      'https://github.com/bibi21000/janitoo_raspberry_1wire/archive/master.zip#egg=janitoo_raspberry_1wire',
       'https://github.com/bibi21000/janitoo_raspberry_dht/archive/master.zip#egg=janitoo_raspberry_dht',
       'https://github.com/bibi21000/janitoo_raspberry_gpio/archive/master.zip#egg=janitoo_raspberry_gpio',
       'https://github.com/bibi21000/janitoo_raspberry_i2c/archive/master.zip#egg=janitoo_raspberry_i2c',
@@ -118,22 +122,20 @@ setup(
       'https://github.com/bibi21000/janitoo_raspberry_spi/archive/master.zip#egg=janitoo_raspberry_spi',
       'https://github.com/bibi21000/janitoo_raspberry_spi_ili9341/archive/master.zip#egg=janitoo_raspberry_spi_ili9341',
       'https://github.com/bibi21000/janitoo_raspberry_spi_pn532/archive/master.zip#egg=janitoo_raspberry_spi_pn532',
+      'https://github.com/bibi21000/janitoo_hostsensor/archive/master.zip#egg=janitoo_hostsensor',
+      'https://github.com/bibi21000/janitoo_hostsensor_raspberry/archive/master.zip#egg=janitoo_hostsensor_raspberry',
     ],
     entry_points = {
         "janitoo.threads": [
-            "lapinoo = janitoo_lapinoo.thread_lapinoo:make_thread",
+            "rantanplan = janitoo_rantanplan.thread_rantanplan:make_thread",
         ],
         "janitoo.components": [
-            "lapinoo.ambiance = janitoo_lapinoo.lapinoo:make_ambiance",
-            "lapinoo.screen = janitoo_lapinoo.lapinoo:make_screen",
-            "lapinoo.led = janitoo_lapinoo.lapinoo:make_led",
-            "lapinoo.rfid = janitoo_lapinoo.lapinoo:make_rfid",
-            "lapinoo.proximity = janitoo_lapinoo.lapinoo:make_proximity",
-            "lapinoo.rtc = janitoo_lapinoo.lapinoo:make_rtc",
-            "lapinoo.photo = janitoo_lapinoo.lapinoo:make_photo",
-            "lapinoo.video = janitoo_lapinoo.lapinoo:make_video",
-            "lapinoo.videostream = janitoo_lapinoo.lapinoo:make_videostream",
-            "lapinoo.audiostream = janitoo_lapinoo.lapinoo:make_audiostream",
+            "rantanplan.ambiance = janitoo_rantanplan.rantanplan:make_ambiance",
+            "rantanplan.proximity = janitoo_rantanplan.rantanplan:make_proximity",
+            "rantanplan.pir = janitoo_rantanplan.rantanplan:make_pir",
+            "rantanplan.led = janitoo_rantanplan.rantanplan:make_led",
+            "rantanplan.cpu = janitoo_rantanplan.rantanplan:make_cpu",
+            "rantanplan.temperature = janitoo_rantanplan.rantanplan:make_temperature",
         ],
     },
 )
