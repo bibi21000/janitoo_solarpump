@@ -41,23 +41,20 @@ from janitoo.runner import Runner, jnt_parse_args
 from janitoo.server import JNTServer
 from janitoo.utils import HADD_SEP, HADD
 
-from janitoo_lapinoo.server import LapinooServer
+from janitoo_rantanplan.server import RantanplanServer
 
-#~ class TestLapinooSerser(JNTTDockerServer, JNTTDockerServerCommon):
-    #~ """Test the server
-    #~ """
-    #~ loglevel = logging.DEBUG
-    #~ path = '/tmp/janitoo_test'
-    #~ broker_user = 'toto'
-    #~ broker_password = 'toto'
-    #~ server_class = LapinooServer
-    #~ server_conf = "tests/data/janitoo_lapinoo.conf"
-#~
-    #~ hadds = [HADD%(222,0), HADD%(222,1), HADD%(222,2), HADD%(222,3),
-             #~ HADD%(222,4), HADD%(222,5), HADD%(222,6), HADD%(222,7), HADD%(222,8), HADD%(222,9),
-             #~ HADD%(222,10), HADD%(222,11)]
-#~
-    #~ def test_040_server_start_no_error_in_log(self):
-        #~ JNTTDockerServer.onlyDockerTest()
-        #~ JNTTDockerServerCommon.minimal_040_server_start_reload_restart(self)
+class TestRantanplanSerser(JNTTDockerServer, JNTTDockerServerCommon):
+    """Test the server
+    """
+    loglevel = logging.DEBUG
+    path = '/tmp/janitoo_test'
+    broker_user = 'toto'
+    broker_password = 'toto'
+    server_class = RantanplanServer
+    server_conf = "tests/data/janitoo_rantanplan.conf"
+    hadds = [HADD%(222,0), HADD%(222,1), HADD%(222,2), HADD%(222,3),
+             HADD%(222,4), HADD%(222,5), HADD%(222,6)]
+
+    def test_040_server_start_no_error_in_log(self):
+        JNTTDockerServerCommon.minimal_040_server_start_reload_restart(self)
 

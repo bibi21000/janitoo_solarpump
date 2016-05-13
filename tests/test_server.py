@@ -81,6 +81,9 @@ class TestRantanplanServer(JNTTServer, JNTTServerCommon):
         self.skipRasperryTest()
         JNTTServerCommon.test_030_wait_for_all_nodes(self)
 
+    def test_040_server_start_no_error_in_log(self):
+        JNTTServerCommon.minimal_040_server_start_reload_restart(self)
+
     def test_100_server_start_machine_state(self):
         self.start()
         time.sleep(10)
