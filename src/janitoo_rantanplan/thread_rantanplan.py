@@ -51,7 +51,7 @@ assert(COMMAND_DESC[COMMAND_CONTROLLER] == 'COMMAND_CONTROLLER')
 OID='rantanplan'
 
 def make_thread(options, force=False):
-    if get_option_autostart(options, OID) == True or force:
+    if get_option_autostart(options, OID) or force:
         return RantanplanThread(options)
     else:
         return None
