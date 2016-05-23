@@ -208,7 +208,7 @@ class RantanplanBus(JNTBus):
         try:
             self.nodeman.find_value('led', 'blink').data = 'heartbeat'
             self.nodeman.add_polls(self.polled_sensors, slow_start=True, overwrite=False)
-        except:
+        except Exception:
             logger.exception("[%s] - Error in on_enter_reporting", self.__class__.__name__)
         finally:
             self.bus_release()
@@ -221,7 +221,7 @@ class RantanplanBus(JNTBus):
         try:
             self.nodeman.remove_polls(self.polled_sensors)
             self.nodeman.find_value('led', 'blink').data = 'off'
-        except:
+        except Exception:
             logger.exception("[%s] - Error in on_enter_sleeping", self.__class__.__name__)
         finally:
             self.bus_release()
@@ -234,7 +234,7 @@ class RantanplanBus(JNTBus):
         try:
             self.nodeman.find_value('led', 'blink').data = 'info'
             self.nodeman.add_polls(self.polled_sensors, slow_start=True, overwrite=False)
-        except:
+        except Exception:
             logger.exception("[%s] - Error in on_enter_guarding", self.__class__.__name__)
         finally:
             self.bus_release()
@@ -303,7 +303,7 @@ class RantanplanBus(JNTBus):
             #Check the proximity sensors
             critical_proxi = self.get_bus_value('proximity_critical').data
 
-        except:
+        except Exception:
             logger.exception("[%s] - Error in on_check", self.__class__.__name__)
         finally:
             self.bus_release()
