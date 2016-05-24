@@ -59,7 +59,7 @@ assert(COMMAND_DESC[COMMAND_WEB_RESOURCE] == 'COMMAND_WEB_RESOURCE')
 assert(COMMAND_DESC[COMMAND_DOC_RESOURCE] == 'COMMAND_DOC_RESOURCE')
 ##############################################################
 
-OID = 'rantanplan'
+from janitoo_rantanplan import OID
 
 def make_ambiance(**kwargs):
     return AmbianceComponent(**kwargs)
@@ -356,7 +356,7 @@ class AmbianceComponent(DHTComponent):
     def __init__(self, bus=None, addr=None, **kwargs):
         """
         """
-        oid = kwargs.pop('oid', 'rantanplan.ambiance')
+        oid = kwargs.pop('oid', '%s.ambiance'%OID)
         name = kwargs.pop('name', "Ambiance sensor")
         DHTComponent.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
                 **kwargs)
@@ -368,7 +368,7 @@ class ProximityComponent(SonicComponent):
     def __init__(self, bus=None, addr=None, **kwargs):
         """
         """
-        oid = kwargs.pop('oid', 'rantanplan.proximity')
+        oid = kwargs.pop('oid', '%s.proximity'%OID)
         name = kwargs.pop('name', "Proximity sensor")
         SonicComponent.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
                 **kwargs)
@@ -380,7 +380,7 @@ class PirComponent(GPIOPir):
     def __init__(self, bus=None, addr=None, **kwargs):
         """
         """
-        oid = kwargs.pop('oid', 'rantanplan.pir')
+        oid = kwargs.pop('oid', '%s.pir'%OID)
         name = kwargs.pop('name', "Pir sensor")
         GPIOPir.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
                 **kwargs)
@@ -392,7 +392,7 @@ class LedComponent(GPIOLed):
     def __init__(self, bus=None, addr=None, **kwargs):
         """
         """
-        oid = kwargs.pop('oid', 'rantanplan.led')
+        oid = kwargs.pop('oid', '%s.led'%OID)
         name = kwargs.pop('name', "Led")
         GPIOLed.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
                 **kwargs)
@@ -404,7 +404,7 @@ class TemperatureComponent(DS18B20):
     def __init__(self, bus=None, addr=None, **kwargs):
         """
         """
-        oid = kwargs.pop('oid', 'rantanplan.temperature')
+        oid = kwargs.pop('oid', '%s.temperature'%OID)
         name = kwargs.pop('name', "Temperature")
         DS18B20.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
                 **kwargs)
@@ -416,7 +416,7 @@ class CpuComponent(HardwareCpu):
     def __init__(self, bus=None, addr=None, **kwargs):
         """
         """
-        oid = kwargs.pop('oid', 'rantanplan.cpu')
+        oid = kwargs.pop('oid', '%s.cpu'%OID)
         name = kwargs.pop('name', "CPU")
         HardwareCpu.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
                 **kwargs)
