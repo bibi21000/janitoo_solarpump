@@ -37,7 +37,8 @@ from janitoo.utils import HADD
 from janitoo.node import JNTNode
 from janitoo.value import JNTValue
 from janitoo.component import JNTComponent
-from janitoo.bus import JNTBus
+
+from janitoo_factory.buses.fsm import JNTFsmBus
 
 from janitoo_raspberry_dht.dht import DHTComponent
 from janitoo_raspberry_gpio.gpio import GpioBus, OutputComponent, PirComponent as GPIOPir, LedComponent as GPIOLed, SonicComponent
@@ -80,11 +81,12 @@ def make_cpu(**kwargs):
     return CpuComponent(**kwargs)
 
 
-class RantanplanBus(JNTBus):
+class RantanplanBus(JNTFsmBus):
     """A bus to manage Rantanplan
     """
 
     states = [
+       'booting',
        'sleeping',
        'reporting',
        { 'name': 'guarding',
@@ -106,21 +108,29 @@ class RantanplanBus(JNTBus):
     """
 
     transitions = [
-        { 'trigger': 'wakeup',
-            'source': '*',
-            'dest': 'reporting',
-        },
-        { 'trigger': 'report',
-            'source': '*',
-            'dest': 'reporting',
+        { 'trigger': 'boot',
+            'source': 'booting',
+            'dest': 'sleeping',
+            'conditions': 'condition_values',
         },
         { 'trigger': 'sleep',
             'source': '*',
             'dest': 'sleeping',
         },
+        { 'trigger': 'wakeup',
+            'source': '*',
+            'dest': 'reporting',
+            'conditions': 'condition_values',
+        },
+        { 'trigger': 'report',
+            'source': '*',
+            'dest': 'reporting',
+            'conditions': 'condition_values',
+        },
         { 'trigger': 'guard',
             'source': '*',
             'dest': 'guarding',
+            'conditions': 'condition_values',
         },
         { 'trigger': 'bark',
             'source': 'guarding',
@@ -147,11 +157,10 @@ class RantanplanBus(JNTBus):
     def __init__(self, **kwargs):
         """
         """
-        JNTBus.__init__(self, **kwargs)
+        JNTFsmBus.__init__(self, **kwargs)
         self.buses = {}
         self.buses['gpiobus'] = GpioBus(masters=[self], **kwargs)
         self.buses['1wire'] = OnewireBus(masters=[self], **kwargs)
-        self._statemachine =  None
         self.check_timer = None
         uuid="{:s}_timer_delay".format(OID)
         self.values[uuid] = self.value_factory['config_integer'](options=self.options, uuid=uuid,
@@ -188,17 +197,27 @@ class RantanplanBus(JNTBus):
 
     @property
     def polled_sensors(self):
-        """
+        """The sensors we will poll
         """
         return [
             self.nodeman.find_value('temperature', 'temperature'),
             self.nodeman.find_value('ambiance', 'temperature'),
-            self.nodeman.find_value('cpu', 'temperature'),
             self.nodeman.find_value('ambiance', 'humidity'),
             self.nodeman.find_value('cpu', 'temperature'),
+            self.nodeman.find_value('cpu', 'voltage'),
+            self.nodeman.find_value('cpu', 'frequency'),
+            self.nodeman.find_value('led', 'switch'),
+            self.nodeman.find_value('led', 'blink'),
             self.nodeman.find_value('pir', 'status'),
-            self.nodeman.find_value('sonic', 'status'),
+            self.nodeman.find_value('proximity', 'status'),
         ]
+
+    def condition_values(self):
+        """Return True if all sensors are available
+        """
+        polled_sensors = self.polled_sensors
+        logger.debug("[%s] - condition_values sensors : %s", self.__class__.__name__, polled_sensors)
+        return all(v is not None for v in polled_sensors)
 
     def on_enter_reporting(self):
         """
@@ -313,34 +332,15 @@ class RantanplanBus(JNTBus):
         """
         for bus in self.buses:
             self.buses[bus].start(mqttc, trigger_thread_reload_cb=None)
-        JNTBus.start(self, mqttc, trigger_thread_reload_cb)
-        self._statemachine = self.create_fsm()
-
-    def create_fsm(self):
-        """Create the fsm
-        """
-        return Machine(self,
-            states=self.states,
-            transitions=self.transitions,
-            initial='sleeping')
+        JNTFsmBus.start(self, mqttc, trigger_thread_reload_cb)
 
     def stop(self):
         """Stop the bus
         """
         self.stop_check()
-        self.sleep()
         for bus in self.buses:
             self.buses[bus].stop()
-        JNTBus.stop(self)
-
-    def check_heartbeat(self):
-        """Check that the component is 'available'
-
-        """
-        res = True
-        #~ for bus in self.buses:
-            #~ res = res and self.buses[bus].check_heartbeat()
-        return res
+        JNTFsmBus.stop(self)
 
     def loop(self, stopevent):
         """Retrieve data
