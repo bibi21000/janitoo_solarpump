@@ -167,7 +167,7 @@ class RantanplanBus(JNTFsmBus):
             node_uuid=self.uuid,
             help='The delay between 2 checks',
             label='Timer.',
-            default=45,
+            default=10,
         )
         uuid="{:s}_temperature_critical".format(OID)
         self.values[uuid] = self.value_factory['config_integer'](options=self.options, uuid=uuid,
@@ -240,10 +240,17 @@ class RantanplanBus(JNTFsmBus):
         try:
             self.nodeman.remove_polls(self.polled_sensors)
             self.nodeman.find_value('led', 'blink').data = 'off'
+            self.nodeman.find_bus_value('state').poll_delay = 900
         except Exception:
             logger.exception("[%s] - Error in on_enter_sleeping", self.__class__.__name__)
         finally:
             self.bus_release()
+
+    def on_exit_sleeping(self):
+        """
+        """
+        logger.debug("[%s] - on_exit_sleeping", self.__class__.__name__)
+        self.on_check()
 
     def on_enter_guarding(self):
         """
