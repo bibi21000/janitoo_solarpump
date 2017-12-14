@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""The Raspberry rantanplan
+"""The Raspberry solarpump
 
 """
 
@@ -60,19 +60,19 @@ assert(COMMAND_DESC[COMMAND_WEB_RESOURCE] == 'COMMAND_WEB_RESOURCE')
 assert(COMMAND_DESC[COMMAND_DOC_RESOURCE] == 'COMMAND_DOC_RESOURCE')
 ##############################################################
 
-from janitoo_rantanplan import OID
+from janitoo_solarpump import OID
 
 def make_ambiance(**kwargs):
     return AmbianceComponent(**kwargs)
 
-def make_led(**kwargs):
-    return LedComponent(**kwargs)
+#~ def make_led(**kwargs):
+    #~ return LedComponent(**kwargs)
 
-def make_pir(**kwargs):
-    return PirComponent(**kwargs)
+#~ def make_pir(**kwargs):
+    #~ return PirComponent(**kwargs)
 
-def make_proximity(**kwargs):
-    return ProximityComponent(**kwargs)
+#~ def make_proximity(**kwargs):
+    #~ return ProximityComponent(**kwargs)
 
 def make_temperature(**kwargs):
     return TemperatureComponent(**kwargs)
@@ -81,8 +81,8 @@ def make_cpu(**kwargs):
     return CpuComponent(**kwargs)
 
 
-class RantanplanBus(JNTFsmBus):
-    """A bus to manage Rantanplan
+class SolarpumpBus(JNTFsmBus):
+    """A bus to manage Solarpump
     """
 
     states = [
@@ -96,7 +96,7 @@ class RantanplanBus(JNTFsmBus):
          'children': ['barking', 'bitting'],
        },
     ]
-    """The rantanplan states :
+    """The solarpump states :
         - sleeping : bbzzzzzz...
         - reporting : only reports events as normal values ... what a good job
         - guarding : guard the zone, musts reports events as alarm values. Show I'm up by blinking my led.
@@ -189,7 +189,7 @@ class RantanplanBus(JNTFsmBus):
         uuid="{:s}_temperature".format(OID)
         self.values[uuid] = self.value_factory['sensor_temperature'](options=self.options, uuid=uuid,
             node_uuid=self.uuid,
-            help='The average temperature of rantanplan. Can be use as a good quality source for a thermostat.',
+            help='The average temperature of solarpump. Can be use as a good quality source for a thermostat.',
             label='Temp',
         )
         poll_value = self.values[uuid].create_poll_value(default=300)

@@ -41,17 +41,17 @@ from janitoo.runner import Runner, jnt_parse_args
 from janitoo.server import JNTServer
 from janitoo.utils import HADD_SEP, HADD
 
-from janitoo_rantanplan.server import RantanplanServer
+from janitoo_solarpump.server import SolarpumpServer
 
-class TestRantanplanSerser(JNTTDockerServer, JNTTDockerServerCommon):
+class TestSolarpumpSerser(JNTTDockerServer, JNTTDockerServerCommon):
     """Test the server
     """
     loglevel = logging.DEBUG
     path = '/tmp/janitoo_test'
     broker_user = 'toto'
     broker_password = 'toto'
-    server_class = RantanplanServer
-    server_conf = "tests/data/janitoo_rantanplan.conf"
+    server_class = SolarpumpServer
+    server_conf = "tests/data/janitoo_solarpump.conf"
     hadds = [HADD%(222,0), HADD%(222,1), HADD%(222,2), HADD%(222,3),
              HADD%(222,4), HADD%(222,5), HADD%(222,6)]
 

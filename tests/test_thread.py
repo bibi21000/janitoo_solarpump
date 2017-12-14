@@ -45,7 +45,6 @@ from janitoo.utils import TOPIC_NODES, TOPIC_NODES_REPLY, TOPIC_NODES_REQUEST
 from janitoo.utils import TOPIC_BROADCAST_REPLY, TOPIC_BROADCAST_REQUEST
 from janitoo.utils import TOPIC_VALUES_USER, TOPIC_VALUES_CONFIG, TOPIC_VALUES_SYSTEM, TOPIC_VALUES_BASIC
 
-import janitoo_raspberry_sound.sound
 
 ##############################################################
 #Check that we are in sync with the official command classes
@@ -76,14 +75,14 @@ class TestRantanplanThread(JNTTThreadRun, JNTTThreadRunCommon):
     def test_102_check_values(self):
         self.wait_for_nodeman()
         time.sleep(5)
-        self.assertValueOnBus('proximity','status')
-        self.assertValueOnBus('pir','status')
+        #~ self.assertValueOnBus('proximity','status')
+        #~ self.assertValueOnBus('pir','status')
         self.assertValueOnBus('cpu','temperature')
         self.assertValueOnBus('temperature','temperature')
         self.assertValueOnBus('ambiance','temperature')
         self.assertValueOnBus('ambiance','humidity')
-        self.assertValueOnBus('led','switch')
-        self.assertValueOnBus('led','blink')
+        #~ self.assertValueOnBus('led','switch')
+        #~ self.assertValueOnBus('led','blink')
 
     def test_103_state_machine(self):
         self.wait_for_nodeman()

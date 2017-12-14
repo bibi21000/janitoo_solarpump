@@ -1,17 +1,17 @@
 #!/bin/sh
 
 ### BEGIN INIT INFO
-# Provides:             jnt_rantanplan
+# Provides:             jnt_solarpump
 # Required-Start:       $remote_fs $syslog $network
 # Required-Stop:        $remote_fs $syslog $network
 # Default-Start:        2 3 4 5
 # Default-Stop:         0 1 6
-# Short-Description:    Janitoo rantanplan
-# Description:          Janitoo rantanplan appliance server
+# Short-Description:    Janitoo solarpump
+# Description:          Janitoo solarpump appliance server
 #
 ### END INIT INFO
 
-NAME="jnt_rantanplan"
+NAME="jnt_solarpump"
 
 # Internal script
 # You should not update lines below

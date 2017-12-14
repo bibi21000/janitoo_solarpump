@@ -4,8 +4,8 @@ import pygraphviz as pgv
 import threading
 
 from janitoo.options import JNTOptions
-from janitoo_rantanplan.rantanplan import RantanplanBus
+from janitoo_solarpump.solarpump import SolarpumpBus
 
-bus = RantanplanBus(options=JNTOptions({}))
+bus = SolarpumpBus(options=JNTOptions({}))
 fsm = bus.create_fsm()
 fsm.show_graph(fname='rst/images/fsm_bus.png', prog='dot')

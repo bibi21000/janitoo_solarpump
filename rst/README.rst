@@ -1,24 +1,24 @@
-.. image:: https://travis-ci.org/bibi21000/janitoo_rantanplan.svg?branch=master
-    :target: https://travis-ci.org/bibi21000/janitoo_rantanplan
+.. image:: https://travis-ci.org/bibi21000/janitoo_solarpump.svg?branch=master
+    :target: https://travis-ci.org/bibi21000/janitoo_solarpump
     :alt: Travis status
 
-.. image:: https://coveralls.io/repos/bibi21000/janitoo_rantanplan/badge.svg?branch=master&service=github
-    :target: https://coveralls.io/github/bibi21000/janitoo_rantanplan?branch=master
+.. image:: https://coveralls.io/repos/bibi21000/janitoo_solarpump/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/bibi21000/janitoo_solarpump?branch=master
     :alt: Coveralls results
 
-.. image:: https://landscape.io/github/bibi21000/janitoo_rantanplan/master/landscape.svg?style=flat
-   :target: https://landscape.io/github/bibi21000/janitoo_rantanplan/master
+.. image:: https://landscape.io/github/bibi21000/janitoo_solarpump/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/bibi21000/janitoo_solarpump/master
    :alt: Code Health
 
 .. image:: https://img.shields.io/badge/Documentation-ok-brightgreen.svg?style=flat
-   :target: https://bibi21000.github.io/janitoo_rantanplan/index.html
+   :target: https://bibi21000.github.io/janitoo_solarpump/index.html
    :alt: Documentation
 
-==========
-Rantanplan
-==========
+=========
+Solarpump
+=========
 
-Another raspberry appliance server developped using Janitoo
+Another raspberry appliance server developped using Janitoo. Manage a solar pump
 
 
 Needs
@@ -41,7 +41,7 @@ gpio : PIR
 
 Documentation
 =============
-You can browse online documentation here : https://bibi21000.github.io/janitoo_rantanplan/.
+You can browse online documentation here : https://bibi21000.github.io/janitoo_solarpump/.
 
 Tutorial
 ========
@@ -50,17 +50,17 @@ You can find a tutorial here : https://bibi21000.github.io/janitoo_tutorial/.
 Development status
 ==================
 
-janitoo_rantanplan :
-    .. image:: https://travis-ci.org/bibi21000/janitoo_rantanplan.svg?branch=master
-        :target: https://travis-ci.org/bibi21000/janitoo_rantanplan
+janitoo_solarpump :
+    .. image:: https://travis-ci.org/bibi21000/janitoo_solarpump.svg?branch=master
+        :target: https://travis-ci.org/bibi21000/janitoo_solarpump
         :alt: Travis status
 
-    .. image:: https://circleci.com/gh/bibi21000/janitoo_rantanplan.png?style=shield
-        :target: https://circleci.com/gh/bibi21000/janitoo_rantanplan
+    .. image:: https://circleci.com/gh/bibi21000/janitoo_solarpump.png?style=shield
+        :target: https://circleci.com/gh/bibi21000/janitoo_solarpump
         :alt: Circle status
 
-    .. image:: https://coveralls.io/repos/bibi21000/janitoo_rantanplan/badge.svg?branch=master&service=github
-        :target: https://coveralls.io/github/bibi21000/janitoo_rantanplan?branch=master
+    .. image:: https://coveralls.io/repos/bibi21000/janitoo_solarpump/badge.svg?branch=master&service=github
+        :target: https://coveralls.io/github/bibi21000/janitoo_solarpump?branch=master
         :alt: Coveralls results
 
 
@@ -81,16 +81,6 @@ janitoo_hostsensor_raspberry :
 
     .. image:: https://coveralls.io/repos/bibi21000/janitoo_hostsensor_raspberry/badge.svg?branch=master&service=github
         :target: https://coveralls.io/github/bibi21000/janitoo_hostsensor_raspberry?branch=master
-        :alt: Coveralls results
-
-
-janitoo_raspberry_1wire :
-    .. image:: https://travis-ci.org/bibi21000/janitoo_raspberry_1wire.svg?branch=master
-        :target: https://travis-ci.org/bibi21000/janitoo_raspberry_1wire
-        :alt: Travis status
-
-    .. image:: https://coveralls.io/repos/bibi21000/janitoo_raspberry_1wire/badge.svg?branch=master&service=github
-        :target: https://coveralls.io/github/bibi21000/janitoo_raspberry_1wire?branch=master
         :alt: Coveralls results
 
 

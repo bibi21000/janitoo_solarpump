@@ -44,8 +44,8 @@ from janitoo.utils import TOPIC_NODES, TOPIC_NODES_REPLY, TOPIC_NODES_REQUEST
 from janitoo.utils import TOPIC_BROADCAST_REPLY, TOPIC_BROADCAST_REQUEST
 from janitoo.utils import TOPIC_VALUES_USER, TOPIC_VALUES_CONFIG, TOPIC_VALUES_SYSTEM, TOPIC_VALUES_BASIC
 
-import janitoo_rantanplan.thread_rantanplan
-import janitoo_rantanplan.rantanplan
+import janitoo_solarpump.thread_solarpump
+import janitoo_solarpump.solarpump
 
 ##############################################################
 #Check that we are in sync with the official command classes
@@ -61,29 +61,29 @@ assert(COMMAND_DESC[COMMAND_DISCOVERY] == 'COMMAND_DISCOVERY')
 class TestAmbianceComponent(JNTTComponent, JNTTComponentCommon):
     """Test the component
     """
-    component_name = "rantanplan.ambiance"
+    component_name = "solarpump.ambiance"
 
-class TestLedComponent(JNTTComponent, JNTTComponentCommon):
-    """Test the component
-    """
-    component_name = "rantanplan.led"
+#~ class TestLedComponent(JNTTComponent, JNTTComponentCommon):
+    #~ """Test the component
+    #~ """
+    #~ component_name = "solarpump.led"
 
-class TestPirComponent(JNTTComponent, JNTTComponentCommon):
-    """Test the component
-    """
-    component_name = "rantanplan.pir"
+#~ class TestPirComponent(JNTTComponent, JNTTComponentCommon):
+    #~ """Test the component
+    #~ """
+    #~ component_name = "solarpump.pir"
 
-class TestProximityComponent(JNTTComponent, JNTTComponentCommon):
-    """Test the component
-    """
-    component_name = "rantanplan.proximity"
+#~ class TestProximityComponent(JNTTComponent, JNTTComponentCommon):
+    #~ """Test the component
+    #~ """
+    #~ component_name = "solarpump.proximity"
 
 class TestTemperatureComponent(JNTTComponent, JNTTComponentCommon):
     """Test the component
     """
-    component_name = "rantanplan.temperature"
+    component_name = "solarpump.temperature"
 
 class TestCpuComponent(JNTTComponent, JNTTComponentCommon):
     """Test the component
     """
-    component_name = "rantanplan.cpu"
+    component_name = "solarpump.cpu"

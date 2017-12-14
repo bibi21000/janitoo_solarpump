@@ -44,7 +44,7 @@ from janitoo.utils import TOPIC_BROADCAST_REPLY, TOPIC_BROADCAST_REQUEST
 from janitoo.utils import TOPIC_VALUES_USER, TOPIC_VALUES_CONFIG, TOPIC_VALUES_SYSTEM, TOPIC_VALUES_BASIC
 from janitoo.thread import JNTBusThread
 
-from janitoo_rantanplan.server import RantanplanServer
+from janitoo_solarpump.server import SolarpumpServer
 
 ##############################################################
 #Check that we are in sync with the official command classes
@@ -56,16 +56,16 @@ COMMAND_DISCOVERY = 0x5000
 assert(COMMAND_DESC[COMMAND_DISCOVERY] == 'COMMAND_DISCOVERY')
 ##############################################################
 
-class TestRantanplanServer(JNTTServer, JNTTServerCommon):
+class TestSolarpumpServer(JNTTServer, JNTTServerCommon):
     """Test the pi server
     """
     loglevel = logging.DEBUG
     path = '/tmp/janitoo_test'
     broker_user = 'toto'
     broker_password = 'toto'
-    server_class = RantanplanServer
-    server_conf = "tests/data/janitoo_rantanplan.conf"
-    server_section = "rantanplan"
+    server_class = SolarpumpServer
+    server_conf = "tests/data/janitoo_solarpump.conf"
+    server_section = "solarpump"
 
     hadds = [HADD%(222,0), HADD%(222,1), HADD%(222,2), HADD%(222,3), HADD%(222,4), HADD%(222,5), HADD%(222,6)]
 

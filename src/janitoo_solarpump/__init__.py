@@ -26,4 +26,4 @@ except Exception:                                                     # pragma: 
     # bootstrapping                                         # pragma: no cover
     pass                                                    # pragma: no cover
 
-OID='rantanplan'
+OID='solarpump'
