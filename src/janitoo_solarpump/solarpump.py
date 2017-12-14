@@ -367,53 +367,53 @@ class AmbianceComponent(DHTComponent):
                 **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
-class ProximityComponent(SonicComponent):
-    """ A component for a proximity sensor """
+#~ class ProximityComponent(SonicComponent):
+    #~ """ A component for a proximity sensor """
 
-    def __init__(self, bus=None, addr=None, **kwargs):
-        """
-        """
-        oid = kwargs.pop('oid', '%s.proximity'%OID)
-        name = kwargs.pop('name', "Proximity sensor")
-        SonicComponent.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
-                **kwargs)
-        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+    #~ def __init__(self, bus=None, addr=None, **kwargs):
+        #~ """
+        #~ """
+        #~ oid = kwargs.pop('oid', '%s.proximity'%OID)
+        #~ name = kwargs.pop('name', "Proximity sensor")
+        #~ SonicComponent.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                #~ **kwargs)
+        #~ logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
-class PirComponent(GPIOPir):
-    """ A component for a PIR """
+#~ class PirComponent(GPIOPir):
+    #~ """ A component for a PIR """
 
-    def __init__(self, bus=None, addr=None, **kwargs):
-        """
-        """
-        oid = kwargs.pop('oid', '%s.pir'%OID)
-        name = kwargs.pop('name', "Pir sensor")
-        GPIOPir.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
-                **kwargs)
-        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+    #~ def __init__(self, bus=None, addr=None, **kwargs):
+        #~ """
+        #~ """
+        #~ oid = kwargs.pop('oid', '%s.pir'%OID)
+        #~ name = kwargs.pop('name', "Pir sensor")
+        #~ GPIOPir.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                #~ **kwargs)
+        #~ logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
-class LedComponent(GPIOLed):
-    """ A component for a Led (on/off) """
+#~ class LedComponent(GPIOLed):
+    #~ """ A component for a Led (on/off) """
 
-    def __init__(self, bus=None, addr=None, **kwargs):
-        """
-        """
-        oid = kwargs.pop('oid', '%s.led'%OID)
-        name = kwargs.pop('name', "Led")
-        GPIOLed.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
-                **kwargs)
-        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+    #~ def __init__(self, bus=None, addr=None, **kwargs):
+        #~ """
+        #~ """
+        #~ oid = kwargs.pop('oid', '%s.led'%OID)
+        #~ name = kwargs.pop('name', "Led")
+        #~ GPIOLed.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                #~ **kwargs)
+        #~ logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
-class TemperatureComponent(DS18B20):
-    """ A water temperature component """
+#~ class TemperatureComponent(DS18B20):
+    #~ """ A water temperature component """
 
-    def __init__(self, bus=None, addr=None, **kwargs):
-        """
-        """
-        oid = kwargs.pop('oid', '%s.temperature'%OID)
-        name = kwargs.pop('name', "Temperature")
-        DS18B20.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
-                **kwargs)
-        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+    #~ def __init__(self, bus=None, addr=None, **kwargs):
+        #~ """
+        #~ """
+        #~ oid = kwargs.pop('oid', '%s.temperature'%OID)
+        #~ name = kwargs.pop('name', "Temperature")
+        #~ DS18B20.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                #~ **kwargs)
+        #~ logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
 class CpuComponent(HardwareCpu):
     """ A water temperature component """
