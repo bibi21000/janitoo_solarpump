@@ -41,9 +41,7 @@ from janitoo.component import JNTComponent
 from janitoo_factory.buses.fsm import JNTFsmBus
 
 from janitoo_raspberry_dht.dht import DHTComponent
-from janitoo_raspberry_gpio.gpio import GpioBus, OutputComponent, PirComponent as GPIOPir, LedComponent as GPIOLed, SonicComponent
-from janitoo_raspberry_1wire.bus_1wire import OnewireBus
-from janitoo_raspberry_1wire.components import DS18B20
+from janitoo_raspberry_gpio.gpio import GpioBus, OutputComponent
 from janitoo_hostsensor_raspberry.component import HardwareCpu
 
 ##############################################################
