@@ -158,7 +158,7 @@ class SolarpumpBus(JNTFsmBus):
         JNTFsmBus.__init__(self, **kwargs)
         self.buses = {}
         self.buses['gpiobus'] = GpioBus(masters=[self], **kwargs)
-        self.buses['1wire'] = OnewireBus(masters=[self], **kwargs)
+        #~ self.buses['1wire'] = OnewireBus(masters=[self], **kwargs)
         self.check_timer = None
         uuid="{:s}_timer_delay".format(OID)
         self.values[uuid] = self.value_factory['config_integer'](options=self.options, uuid=uuid,
