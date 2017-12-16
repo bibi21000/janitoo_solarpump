@@ -67,7 +67,7 @@ class TestSolarpumpServer(JNTTServer, JNTTServerCommon):
     server_conf = "tests/data/janitoo_solarpump.conf"
     server_section = "solarpump"
 
-    hadds = [HADD%(222,0), HADD%(222,1), HADD%(222,2), HADD%(222,3), HADD%(222,4), HADD%(222,5), HADD%(222,6)]
+    hadds = [HADD%(222,0), HADD%(222,1), HADD%(222,2), HADD%(222,3)]
 
     def test_011_start_reload_stop(self):
         self.skipRasperryTest()

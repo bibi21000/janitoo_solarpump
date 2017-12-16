@@ -72,8 +72,8 @@ def make_ambiance(**kwargs):
 #~ def make_proximity(**kwargs):
     #~ return ProximityComponent(**kwargs)
 
-def make_temperature(**kwargs):
-    return TemperatureComponent(**kwargs)
+#~ def make_temperature(**kwargs):
+    #~ return TemperatureComponent(**kwargs)
 
 def make_cpu(**kwargs):
     return CpuComponent(**kwargs)

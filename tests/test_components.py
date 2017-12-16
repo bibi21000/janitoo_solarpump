@@ -78,10 +78,10 @@ class TestAmbianceComponent(JNTTComponent, JNTTComponentCommon):
     #~ """
     #~ component_name = "solarpump.proximity"
 
-class TestTemperatureComponent(JNTTComponent, JNTTComponentCommon):
-    """Test the component
-    """
-    component_name = "solarpump.temperature"
+#~ class TestTemperatureComponent(JNTTComponent, JNTTComponentCommon):
+    #~ """Test the component
+    #~ """
+    #~ component_name = "solarpump.temperature"
 
 class TestCpuComponent(JNTTComponent, JNTTComponentCommon):
     """Test the component

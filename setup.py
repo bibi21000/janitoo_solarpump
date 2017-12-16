@@ -115,7 +115,6 @@ setup(
         "janitoo.components": [
             "solarpump.ambiance = janitoo_solarpump.solarpump:make_ambiance",
             "solarpump.cpu = janitoo_solarpump.solarpump:make_cpu",
-            "solarpump.temperature = janitoo_solarpump.solarpump:make_temperature",
         ],
     },
 )

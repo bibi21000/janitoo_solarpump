@@ -59,8 +59,8 @@ assert(COMMAND_DESC[COMMAND_DISCOVERY] == 'COMMAND_DISCOVERY')
 class TestRantanplanThread(JNTTThreadRun, JNTTThreadRunCommon):
     """Test the datarrd thread
     """
-    thread_name = "rantanplan"
-    conf_file = "tests/data/janitoo_rantanplan.conf"
+    thread_name = "solarpump"
+    conf_file = "tests/data/janitoo_solarpump.conf"
 
     def test_101_thread_start_wait_long_stop(self):
         #~ self.skipTest("Fail on docker")
