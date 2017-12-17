@@ -83,11 +83,11 @@ def make_temperature(**kwargs):
 def make_output(**kwargs):
     return OutputComponent(**kwargs)
 
+def make_led(**kwargs):
+    return LedComponent(**kwargs)
+
 #~ def make_pump(**kwargs):
     #~ return PumpComponent(**kwargs)
-
-#~ def make_led(**kwargs):
-    #~ return LedComponent(**kwargs)
 
 #~ def make_pir(**kwargs):
     #~ return PirComponent(**kwargs)
@@ -168,11 +168,16 @@ class SolarpumpBus(JNTFsmBus):
         """
         return [
             self.nodeman.find_value('temperature', 'temperature'),
-            self.nodeman.find_value('ambiance', 'temperature'),
-            self.nodeman.find_value('ambiance', 'humidity'),
+            self.nodeman.find_value('ambiancein', 'temperature'),
+            self.nodeman.find_value('ambiancein', 'humidity'),
+            self.nodeman.find_value('ambianceout', 'temperature'),
+            self.nodeman.find_value('ambianceout', 'humidity'),
             self.nodeman.find_value('cpu', 'temperature'),
             self.nodeman.find_value('cpu', 'voltage'),
             self.nodeman.find_value('cpu', 'frequency'),
+            self.nodeman.find_value('led', 'state'),
+            self.nodeman.find_value('pump', 'state'),
+            self.nodeman.find_value('inverter', 'state'),
         ]
 
     def condition_values(self):
@@ -253,7 +258,7 @@ class SolarpumpBus(JNTFsmBus):
             nums = 0
             total = 0
             mini = maxi = None
-            for value in [('temperature', 'temperature'), ('ambiance', 'temperature'), ('cpu', 'temperature')]:
+            for value in [('temperature', 'temperature'), ('ambiancein', 'temperature'), ('ambianceout', 'temperature'), ('cpu', 'temperature')]:
                 data = self.nodeman.find_value(*value).data
                 if data is None:
                     #We should notify a sensor problem here.
@@ -376,6 +381,25 @@ class OutputComponent(GpioOut):
         name = kwargs.pop('name', "Output")
         GpioOut.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
                 **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+class LedComponent(GpioOut):
+    """ A LED/Bulb to report status of the system"""
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', '%s.led'%OID)
+        name = kwargs.pop('name', "Led")
+        GpioOut.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        uuid="blink"
+        self.values[uuid] = self.value_factory['blink'](options=self.options, uuid=uuid,
+            node_uuid=self.uuid,
+            help='The led to report state of the system.',
+            label='LED',
+            default=0,
+        )
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
 #~ class ProximityComponent(SonicComponent):

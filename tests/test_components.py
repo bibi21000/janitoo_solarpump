@@ -88,10 +88,10 @@ class TestOutputComponent(JNTTComponent, JNTTComponentCommon):
     """
     component_name = "solarpump.output"
 
-#~ class TestLedComponent(JNTTComponent, JNTTComponentCommon):
-    #~ """Test the component
-    #~ """
-    #~ component_name = "solarpump.led"
+class TestLedComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "solarpump.led"
 
 #~ class TestPirComponent(JNTTComponent, JNTTComponentCommon):
     #~ """Test the component

@@ -75,8 +75,6 @@ class TestSolarpumpThread(JNTTThreadRun, JNTTThreadRunCommon):
     def test_102_check_values(self):
         self.wait_for_nodeman()
         time.sleep(5)
-        #~ self.assertValueOnBus('proximity','status')
-        #~ self.assertValueOnBus('pir','status')
         self.assertValueOnBus('cpu','temperature')
         self.assertValueOnBus('temperature','temperature')
         self.assertValueOnBus('ambiancein','temperature')
@@ -85,8 +83,7 @@ class TestSolarpumpThread(JNTTThreadRun, JNTTThreadRunCommon):
         self.assertValueOnBus('ambianceout','humidity')
         self.assertValueOnBus('inverter','state')
         self.assertValueOnBus('pump','state')
-        #~ self.assertValueOnBus('led','switch')
-        #~ self.assertValueOnBus('led','blink')
+        self.assertValueOnBus('led','blink')
 
     def test_103_state_machine(self):
         self.wait_for_nodeman()
