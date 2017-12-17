@@ -120,47 +120,22 @@ class SolarpumpBus(JNTFsmBus):
     transitions = [
         { 'trigger': 'boot',
             'source': 'booting',
-            'dest': 'sleeping',
+            'dest': 'charging',
             'conditions': 'condition_values',
         },
         { 'trigger': 'sleep',
             'source': '*',
-            'dest': 'sleeping',
+            'dest': 'charging',
         },
-        { 'trigger': 'wakeup',
+        { 'trigger': 'freeze',
             'source': '*',
-            'dest': 'reporting',
+            'dest': 'freezing',
             'conditions': 'condition_values',
         },
-        { 'trigger': 'report',
+        { 'trigger': 'pump',
             'source': '*',
-            'dest': 'reporting',
+            'dest': 'pumping',
             'conditions': 'condition_values',
-        },
-        { 'trigger': 'guard',
-            'source': '*',
-            'dest': 'guarding',
-            'conditions': 'condition_values',
-        },
-        { 'trigger': 'bark',
-            'source': 'guarding',
-            'dest': 'guarding_barking',
-        },
-        { 'trigger': 'bite',
-            'source': 'guarding',
-            'dest': 'guarding_bitting',
-        },
-        { 'trigger': 'obey',
-            'source': 'guarding',
-            'dest': 'obeying',
-        },
-        { 'trigger': 'bark',
-            'source': 'obeying',
-            'dest': 'obeying_barking',
-        },
-        { 'trigger': 'bite',
-            'source': 'obeying',
-            'dest': 'obeying_bitting',
         },
     ]
 
@@ -179,31 +154,13 @@ class SolarpumpBus(JNTFsmBus):
             label='Timer.',
             default=10,
         )
-        uuid="{:s}_temperature_critical".format(OID)
+        uuid="{:s}_temperature_freeze".format(OID)
         self.values[uuid] = self.value_factory['config_integer'](options=self.options, uuid=uuid,
             node_uuid=self.uuid,
-            help='The critical temperature. If 2 of the 3 temperature sensors are up to this value, a security notification is sent.',
-            label='Critical',
-            default=50,
+            help='The feezing temperature.',
+            label='Freeze',
+            default=0,
         )
-        uuid="{:s}_proximity_critical".format(OID)
-        self.values[uuid] = self.value_factory['config_integer'](options=self.options, uuid=uuid,
-            node_uuid=self.uuid,
-            help='The distance (in cm) under which we should raise a notification.',
-            label='proximity',
-            default=150,
-        )
-        self._bus_lock = threading.Lock()
-        self.presence_events = {}
-
-        uuid="{:s}_temperature".format(OID)
-        self.values[uuid] = self.value_factory['sensor_temperature'](options=self.options, uuid=uuid,
-            node_uuid=self.uuid,
-            help='The average temperature of solarpump. Can be use as a good quality source for a thermostat.',
-            label='Temp',
-        )
-        poll_value = self.values[uuid].create_poll_value(default=300)
-        self.values[poll_value.uuid] = poll_value
 
     @property
     def polled_sensors(self):
@@ -216,10 +173,6 @@ class SolarpumpBus(JNTFsmBus):
             self.nodeman.find_value('cpu', 'temperature'),
             self.nodeman.find_value('cpu', 'voltage'),
             self.nodeman.find_value('cpu', 'frequency'),
-            self.nodeman.find_value('led', 'switch'),
-            self.nodeman.find_value('led', 'blink'),
-            self.nodeman.find_value('pir', 'status'),
-            self.nodeman.find_value('proximity', 'status'),
         ]
 
     def condition_values(self):
@@ -274,20 +227,6 @@ class SolarpumpBus(JNTFsmBus):
             logger.exception("[%s] - Error in on_enter_guarding", self.__class__.__name__)
         finally:
             self.bus_release()
-
-    def bus_acquire(self, blocking=True):
-        """Get a lock on the bus"""
-        if self._bus_lock.acquire(blocking):
-            return True
-        return False
-
-    def bus_release(self):
-        """Release a lock on the bus"""
-        self._bus_lock.release()
-
-    def bus_locked(self):
-        """Get status of the lock"""
-        return self._bus_lock.locked()
 
     def stop_check(self):
         """Check that the component is 'available'
