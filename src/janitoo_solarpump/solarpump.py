@@ -41,8 +41,13 @@ from janitoo.component import JNTComponent
 from janitoo_factory.buses.fsm import JNTFsmBus
 
 from janitoo_raspberry_dht.dht import DHTComponent
-from janitoo_raspberry_gpio.gpio import GpioBus, OutputComponent
+from janitoo_raspberry_gpio.gpio import GpioBus, OutputComponent as GpioOut
+from janitoo_raspberry_i2c.bus_i2c import I2CBus
+from janitoo_raspberry_i2c_ds1307.ds1307 import DS1307Component
+from janitoo_raspberry_i2c_ads1x15.ads import ADSComponent as Ads1x15Component
 from janitoo_hostsensor_raspberry.component import HardwareCpu
+from janitoo_raspberry_1wire.bus_1wire import OnewireBus
+from janitoo_raspberry_1wire.components import DS18B20
 
 ##############################################################
 #Check that we are in sync with the official command classes
@@ -63,6 +68,24 @@ from janitoo_solarpump import OID
 def make_ambiance(**kwargs):
     return AmbianceComponent(**kwargs)
 
+def make_cpu(**kwargs):
+    return CpuComponent(**kwargs)
+
+def make_ads(**kwargs):
+    return AdsComponent(**kwargs)
+
+def make_clock(**kwargs):
+    return ClockComponent(**kwargs)
+
+def make_temperature(**kwargs):
+    return TemperatureComponent(**kwargs)
+
+def make_output(**kwargs):
+    return OutputComponent(**kwargs)
+
+#~ def make_pump(**kwargs):
+    #~ return PumpComponent(**kwargs)
+
 #~ def make_led(**kwargs):
     #~ return LedComponent(**kwargs)
 
@@ -72,12 +95,6 @@ def make_ambiance(**kwargs):
 #~ def make_proximity(**kwargs):
     #~ return ProximityComponent(**kwargs)
 
-#~ def make_temperature(**kwargs):
-    #~ return TemperatureComponent(**kwargs)
-
-def make_cpu(**kwargs):
-    return CpuComponent(**kwargs)
-
 
 class SolarpumpBus(JNTFsmBus):
     """A bus to manage Solarpump
@@ -85,14 +102,9 @@ class SolarpumpBus(JNTFsmBus):
 
     states = [
        'booting',
-       'sleeping',
-       'reporting',
-       { 'name': 'guarding',
-         'children': ['barking', 'bitting'],
-       },
-       { 'name': 'obeying',
-         'children': ['barking', 'bitting'],
-       },
+       'charging',
+       'pumping',
+       'freezing',
     ]
     """The solarpump states :
         - sleeping : bbzzzzzz...
@@ -158,7 +170,7 @@ class SolarpumpBus(JNTFsmBus):
         JNTFsmBus.__init__(self, **kwargs)
         self.buses = {}
         self.buses['gpiobus'] = GpioBus(masters=[self], **kwargs)
-        #~ self.buses['1wire'] = OnewireBus(masters=[self], **kwargs)
+        self.buses['1wire'] = OnewireBus(masters=[self], **kwargs)
         self.check_timer = None
         uuid="{:s}_timer_delay".format(OID)
         self.values[uuid] = self.value_factory['config_integer'](options=self.options, uuid=uuid,
@@ -367,6 +379,66 @@ class AmbianceComponent(DHTComponent):
                 **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
+class CpuComponent(HardwareCpu):
+    """ A water temperature component """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', '%s.cpu'%OID)
+        name = kwargs.pop('name', "CPU")
+        HardwareCpu.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+class ClockComponent(DS1307Component):
+    """ A clock component """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', '%s.clock'%OID)
+        name = kwargs.pop('name', "clock")
+        DS1307Component.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+class AdsComponent(Ads1x15Component):
+    """ An analogic to numeric converter component """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', '%s.ads'%OID)
+        name = kwargs.pop('name', "ADS")
+        Ads1x15Component.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+class TemperatureComponent(DS18B20):
+    """ A water temperature component """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', '%s.temperature'%OID)
+        name = kwargs.pop('name', "Temperature")
+        DS18B20.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+class OutputComponent(GpioOut):
+    """ An output component """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', '%s.output'%OID)
+        name = kwargs.pop('name', "Output")
+        GpioOut.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
 #~ class ProximityComponent(SonicComponent):
     #~ """ A component for a proximity sensor """
 
@@ -403,26 +475,3 @@ class AmbianceComponent(DHTComponent):
                 #~ **kwargs)
         #~ logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
-#~ class TemperatureComponent(DS18B20):
-    #~ """ A water temperature component """
-
-    #~ def __init__(self, bus=None, addr=None, **kwargs):
-        #~ """
-        #~ """
-        #~ oid = kwargs.pop('oid', '%s.temperature'%OID)
-        #~ name = kwargs.pop('name', "Temperature")
-        #~ DS18B20.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
-                #~ **kwargs)
-        #~ logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
-
-class CpuComponent(HardwareCpu):
-    """ A water temperature component """
-
-    def __init__(self, bus=None, addr=None, **kwargs):
-        """
-        """
-        oid = kwargs.pop('oid', '%s.cpu'%OID)
-        name = kwargs.pop('name', "CPU")
-        HardwareCpu.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
-                **kwargs)
-        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)

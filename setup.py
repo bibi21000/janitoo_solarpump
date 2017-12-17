@@ -96,7 +96,8 @@ setup(
                      'janitoo_raspberry_i2c_ads1x15',
                      'janitoo_hostsensor',
                      'janitoo_hostsensor_raspberry',
-                    ],
+                     'janitoo_raspberry_1wire',
+                      ],
     dependency_links = [
       'https://github.com/bibi21000/janitoo/archive/master.zip#egg=janitoo',
       'https://github.com/bibi21000/janitoo_factory/archive/master.zip#egg=janitoo_factory',
@@ -107,6 +108,7 @@ setup(
       'https://github.com/bibi21000/janitoo_raspberry_i2c_ads1x15/archive/master.zip#egg=janitoo_raspberry_i2c_ads1x15',
       'https://github.com/bibi21000/janitoo_hostsensor/archive/master.zip#egg=janitoo_hostsensor',
       'https://github.com/bibi21000/janitoo_hostsensor_raspberry/archive/master.zip#egg=janitoo_hostsensor_raspberry',
+      'https://github.com/bibi21000/janitoo_raspberry_1wire/archive/master.zip#egg=janitoo_raspberry_1wire',
     ],
     entry_points = {
         "janitoo.threads": [
@@ -115,6 +117,10 @@ setup(
         "janitoo.components": [
             "solarpump.ambiance = janitoo_solarpump.solarpump:make_ambiance",
             "solarpump.cpu = janitoo_solarpump.solarpump:make_cpu",
+            "solarpump.clock = janitoo_solarpump.solarpump:make_clock",
+            "solarpump.ads = janitoo_solarpump.solarpump:make_ads",
+            "solarpump.temperature = janitoo_solarpump.solarpump:make_temperature",
+            "solarpump.output = janitoo_solarpump.solarpump:make_output",
         ],
     },
 )

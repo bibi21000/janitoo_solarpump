@@ -63,6 +63,31 @@ class TestAmbianceComponent(JNTTComponent, JNTTComponentCommon):
     """
     component_name = "solarpump.ambiance"
 
+class TestCpuComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "solarpump.cpu"
+
+class TestClockComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "solarpump.clock"
+
+class TestAdsComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "solarpump.ads"
+
+class TestTemperatureComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "solarpump.temperature"
+    
+class TestOutputComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "solarpump.output"
+
 #~ class TestLedComponent(JNTTComponent, JNTTComponentCommon):
     #~ """Test the component
     #~ """
@@ -78,12 +103,3 @@ class TestAmbianceComponent(JNTTComponent, JNTTComponentCommon):
     #~ """
     #~ component_name = "solarpump.proximity"
 
-#~ class TestTemperatureComponent(JNTTComponent, JNTTComponentCommon):
-    #~ """Test the component
-    #~ """
-    #~ component_name = "solarpump.temperature"
-
-class TestCpuComponent(JNTTComponent, JNTTComponentCommon):
-    """Test the component
-    """
-    component_name = "solarpump.cpu"

@@ -56,7 +56,7 @@ COMMAND_DISCOVERY = 0x5000
 assert(COMMAND_DESC[COMMAND_DISCOVERY] == 'COMMAND_DISCOVERY')
 ##############################################################
 
-class TestRantanplanThread(JNTTThreadRun, JNTTThreadRunCommon):
+class TestSolarpumpThread(JNTTThreadRun, JNTTThreadRunCommon):
     """Test the datarrd thread
     """
     thread_name = "solarpump"
@@ -78,11 +78,13 @@ class TestRantanplanThread(JNTTThreadRun, JNTTThreadRunCommon):
         #~ self.assertValueOnBus('proximity','status')
         #~ self.assertValueOnBus('pir','status')
         self.assertValueOnBus('cpu','temperature')
-        #~ self.assertValueOnBus('temperature','temperature')
+        self.assertValueOnBus('temperature','temperature')
         self.assertValueOnBus('ambiancein','temperature')
         self.assertValueOnBus('ambiancein','humidity')
         self.assertValueOnBus('ambianceout','temperature')
         self.assertValueOnBus('ambianceout','humidity')
+        self.assertValueOnBus('inverter','state')
+        self.assertValueOnBus('pump','state')
         #~ self.assertValueOnBus('led','switch')
         #~ self.assertValueOnBus('led','blink')
 
