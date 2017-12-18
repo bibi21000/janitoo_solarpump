@@ -399,8 +399,29 @@ class LedComponent(GpioOut):
             help='The led to report state of the system.',
             label='LED',
             default=0,
+            blink_off_cb=self.blink_off,
+            blink_on_cb=self.blink_off,
         )
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', '%s.output'%OID)
+        name = kwargs.pop('name', "Output")
+        GpioOut.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+    def blink_on(self, node_uuid=None, index=0):
+        """
+        """
+        self.set_state(node_uuid, index, 1)
+
+    def blink_off(self, node_uuid=None, index=0):
+        """
+        """
+        self.set_state(node_uuid, index, 0)
 
 #~ class ProximityComponent(SonicComponent):
     #~ """ A component for a proximity sensor """
