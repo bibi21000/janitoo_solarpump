@@ -404,15 +404,6 @@ class LedComponent(GpioOut):
         )
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
-    def __init__(self, bus=None, addr=None, **kwargs):
-        """
-        """
-        oid = kwargs.pop('oid', '%s.output'%OID)
-        name = kwargs.pop('name', "Output")
-        GpioOut.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
-                **kwargs)
-        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
-
     def blink_on(self, node_uuid=None, index=0):
         """
         """
