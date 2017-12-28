@@ -1,0 +1,38 @@
+janitoo_solarpump package
+=========================
+
+Submodules
+----------
+
+janitoo_solarpump.server module
+-------------------------------
+
+.. automodule:: janitoo_solarpump.server
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+janitoo_solarpump.solarpump module
+----------------------------------
+
+.. automodule:: janitoo_solarpump.solarpump
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+janitoo_solarpump.thread_solarpump module
+-----------------------------------------
+
+.. automodule:: janitoo_solarpump.thread_solarpump
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: janitoo_solarpump
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Solarpump &#8212; janitoo_solarpump 0.0.7 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxcontrib-images/LightBox2/lightbox2/css/lightbox.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/sphinxcontrib-images/LightBox2/lightbox2/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/sphinxcontrib-images/LightBox2/lightbox2/js/lightbox.min.js"></script>
+    <script type="text/javascript" src="_static/sphinxcontrib-images/LightBox2/lightbox2-customize/jquery-noconflict.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body role="document">
+
+  <div id="navbar" class="navbar navbar-inverse navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          janitoo_solarpump</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.7</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="tools/index.html">Tools</a></li>
+                <li><a href="api/index.html">Reference</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="state_machine.html">State machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using_doc.html">Using documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="using_doc.html#the-header">The header</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <a class="reference external image-reference" href="https://travis-ci.org/bibi21000/janitoo_solarpump"><img alt="Travis status" src="https://travis-ci.org/bibi21000/janitoo_solarpump.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://coveralls.io/github/bibi21000/janitoo_solarpump?branch=master"><img alt="Coveralls results" src="https://coveralls.io/repos/bibi21000/janitoo_solarpump/badge.svg?branch=master&amp;service=github" /></a>
+<a class="reference external image-reference" href="https://landscape.io/github/bibi21000/janitoo_solarpump/master"><img alt="Code Health" src="https://landscape.io/github/bibi21000/janitoo_solarpump/master/landscape.svg?style=flat" /></a>
+<a class="reference external image-reference" href="https://bibi21000.github.io/janitoo_solarpump/index.html"><img alt="Documentation" src="https://img.shields.io/badge/Documentation-ok-brightgreen.svg?style=flat" /></a>
+<div class="section" id="solarpump">
+<h1>Solarpump<a class="headerlink" href="#solarpump" title="Permalink to this headline">¶</a></h1>
+<p>Another raspberry appliance server developped using Janitoo. Manage a solar pump</p>
+<div class="section" id="needs">
+<h2>Needs<a class="headerlink" href="#needs" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>PIR</li>
+<li>proximity</li>
+<li>temperature / humidity</li>
+<li>siren</li>
+<li>led status</li>
+</ul>
+</div>
+<div class="section" id="hardware">
+<h2>Hardware<a class="headerlink" href="#hardware" title="Permalink to this headline">¶</a></h2>
+<p>dht : temperature and humidity
+gpio : PIR
+1wire : temperature
+...</p>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>You can browse online documentation here : <a class="reference external" href="https://bibi21000.github.io/janitoo_solarpump/">https://bibi21000.github.io/janitoo_solarpump/</a>.</p>
+</div>
+<div class="section" id="tutorial">
+<h2>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h2>
+<p>You can find a tutorial here : <a class="reference external" href="https://bibi21000.github.io/janitoo_tutorial/">https://bibi21000.github.io/janitoo_tutorial/</a>.</p>
+</div>
+<div class="section" id="development-status">
+<h2>Development status<a class="headerlink" href="#development-status" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>janitoo_solarpump :</dt>
+<dd><a class="first reference external image-reference" href="https://travis-ci.org/bibi21000/janitoo_solarpump"><img alt="Travis status" src="https://travis-ci.org/bibi21000/janitoo_solarpump.svg?branch=master" /></a>
+<a class="reference external image-reference" href="https://circleci.com/gh/bibi21000/janitoo_solarpump"><img alt="Circle status" src="https://circleci.com/gh/bibi21000/janitoo_solarpump.png?style=shield" /></a>
+<a class="last reference external image-reference" href="https://coveralls.io/github/bibi21000/janitoo_solarpump?branch=master"><img alt="Coveralls results" src="https://coveralls.io/repos/bibi21000/janitoo_solarpump/badge.svg?branch=master&amp;service=github" /></a>
+</dd>
+<dt>janitoo_raspberry :</dt>
+<dd><a class="first reference external image-reference" href="https://travis-ci.org/bibi21000/janitoo_raspberry"><img alt="Travis status" src="https://travis-ci.org/bibi21000/janitoo_raspberry.svg?branch=master" /></a>
+<a class="last reference external image-reference" href="https://coveralls.io/github/bibi21000/janitoo_raspberry?branch=master"><img alt="Coveralls results" src="https://coveralls.io/repos/bibi21000/janitoo_raspberry/badge.svg?branch=master&amp;service=github" /></a>
+</dd>
+<dt>janitoo_hostsensor_raspberry :</dt>
+<dd><a class="first reference external image-reference" href="https://travis-ci.org/bibi21000/janitoo_hostsensor_raspberry"><img alt="Travis status" src="https://travis-ci.org/bibi21000/janitoo_hostsensor_raspberry.svg?branch=master" /></a>
+<a class="last reference external image-reference" href="https://coveralls.io/github/bibi21000/janitoo_hostsensor_raspberry?branch=master"><img alt="Coveralls results" src="https://coveralls.io/repos/bibi21000/janitoo_hostsensor_raspberry/badge.svg?branch=master&amp;service=github" /></a>
+</dd>
+<dt>janitoo_raspberry_dht :</dt>
+<dd><a class="first reference external image-reference" href="https://travis-ci.org/bibi21000/janitoo_raspberry_dht"><img alt="Travis status" src="https://travis-ci.org/bibi21000/janitoo_raspberry_dht.svg?branch=master" /></a>
+<a class="last reference external image-reference" href="https://coveralls.io/github/bibi21000/janitoo_raspberry_dht?branch=master"><img alt="Coveralls results" src="https://coveralls.io/repos/bibi21000/janitoo_raspberry_dht/badge.svg?branch=master&amp;service=github" /></a>
+</dd>
+<dt>janitoo_raspberry_gpio :</dt>
+<dd><a class="first reference external image-reference" href="https://travis-ci.org/bibi21000/janitoo_raspberry_gpio"><img alt="Travis status" src="https://travis-ci.org/bibi21000/janitoo_raspberry_gpio.svg?branch=master" /></a>
+<a class="last reference external image-reference" href="https://coveralls.io/github/bibi21000/janitoo_raspberry_gpio?branch=master"><img alt="Coveralls results" src="https://coveralls.io/repos/bibi21000/janitoo_raspberry_gpio/badge.svg?branch=master&amp;service=github" /></a>
+</dd>
+</dl>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2014,2015,2016 Sébastien GALLET aka bibi2100 &lt;bibi21000@gmail.com&gt;.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
