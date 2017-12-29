@@ -67,7 +67,9 @@ class TestSolarpumpServer(JNTTServer, JNTTServerCommon):
     server_conf = "tests/data/janitoo_solarpump.conf"
     server_section = "solarpump"
 
-    hadds = [HADD%(222,0), HADD%(222,1), HADD%(222,2), HADD%(222,3), HADD%(222,4), HADD%(222,5), HADD%(222,6), HADD%(222,7)]
+    hadds = [HADD%(222,0), HADD%(222,1), HADD%(222,2), HADD%(222,3), HADD%(222,4), HADD%(222,5), 
+             HADD%(222,6), HADD%(222,7), HADD%(222,8), HADD%(222,9), HADD%(222,10), HADD%(222,11),
+             HADD%(222,12)]
 
     def test_011_start_reload_stop(self):
         self.skipRasperryTest()
@@ -78,27 +80,43 @@ class TestSolarpumpServer(JNTTServer, JNTTServerCommon):
         JNTTServerCommon.test_012_start_reload_threads_stop(self)
 
     def test_040_server_start_no_error_in_log(self):
-        JNTTServerCommon.minimal_040_server_start_reload_restart(self)
+        self.skipRasperryTest()
+        JNTTServerCommon.test_040_server_start_no_error_in_log(self)
 
     def test_100_server_start_machine_state(self):
         self.start()
         self.waitHeartbeatNodes(hadds=self.hadds)
         self.assertFsmBoot()
         bus = self.server.find_thread(self.server_section).bus
-        bus.guard()
-        time.sleep(2)
-        bus.guard()
-        time.sleep(2)
-        bus.report()
-        time.sleep(15)
-        bus.guard()
-        time.sleep(15)
-        bus.bark()
-        time.sleep(2)
-        bus.guard()
-        time.sleep(2)
-        bus.bark()
-        time.sleep(2)
-        bus.bite()
-        time.sleep(2)
         bus.sleep()
+        time.sleep(1)
+        bus.charge()
+        time.sleep(1)
+        bus.run()
+        time.sleep(1)
+        bus.pump()
+        time.sleep(10)
+        bus.charge()
+        time.sleep(1)
+        bus.run()
+        time.sleep(1)
+        bus.wait()
+        time.sleep(10)
+        bus.freeze()
+        time.sleep(10)
+        bus.sleep()
+        time.sleep(1)
+        bus.charge()
+        time.sleep(1)
+        bus.run()
+        time.sleep(1)
+        bus.wait()
+        time.sleep(1)
+        bus.pump()
+        time.sleep(1)
+        bus.charge()
+        time.sleep(1)
+        bus.freeze()
+        time.sleep(1)
+        bus.sleep()
+        time.sleep(1)

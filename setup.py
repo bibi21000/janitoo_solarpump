@@ -121,6 +121,7 @@ setup(
             "solarpump.ads = janitoo_solarpump.solarpump:make_ads",
             "solarpump.temperature = janitoo_solarpump.solarpump:make_temperature",
             "solarpump.output = janitoo_solarpump.solarpump:make_output",
+            "solarpump.input = janitoo_solarpump.solarpump:make_input",
             "solarpump.led = janitoo_solarpump.solarpump:make_led",
         ],
     },

@@ -41,7 +41,7 @@ from janitoo.component import JNTComponent
 from janitoo_factory.buses.fsm import JNTFsmBus
 
 from janitoo_raspberry_dht.dht import DHTComponent
-from janitoo_raspberry_gpio.gpio import GpioBus, OutputComponent as GpioOut
+from janitoo_raspberry_gpio.gpio import GpioBus, OutputComponent as GpioOut, InputComponent as GpioIn
 from janitoo_raspberry_i2c.bus_i2c import I2CBus
 from janitoo_raspberry_i2c_ds1307.ds1307 import DS1307Component
 from janitoo_raspberry_i2c_ads1x15.ads import ADSComponent as Ads1x15Component
@@ -82,6 +82,9 @@ def make_temperature(**kwargs):
 
 def make_output(**kwargs):
     return OutputComponent(**kwargs)
+    
+def make_input(**kwargs):
+    return InputComponent(**kwargs)
 
 def make_led(**kwargs):
     return LedComponent(**kwargs)
@@ -102,40 +105,57 @@ class SolarpumpBus(JNTFsmBus):
 
     states = [
        'booting',
+       'sleeping',
        'charging',
-       'pumping',
        'freezing',
+       { 'name': 'running',
+         'children': ['pumping', 'waiting'],
+       },
     ]
     """The solarpump states :
-        - sleeping : bbzzzzzz...
-        - reporting : only reports events as normal values ... what a good job
-        - guarding : guard the zone, musts reports events as alarm values. Show I'm up by blinking my led.
-            - barking : a presence have been detected, must bark to identify this guy
-            - bitting : a bad guy is here, must bite it
-        - obeying : Someone, somebody, something send me an order ... just obeying :
-            - barking : a presence have been detected, must bark to identify this guy
-            - bitting : a bad guy is here, must bite it
+        - sleeping : the power is very low, we do not poll sensors again (except the battery ones, 
+        - charging : power is low. We can poll sensors again.
+        - running : power is ok. We may pump
+            - pumping : the pump is on !!!
+            - freezing : stop pumping !!!
+            - waiting : waiting for water
     """
 
     transitions = [
         { 'trigger': 'boot',
             'source': 'booting',
-            'dest': 'charging',
-            'conditions': 'condition_values',
+            'dest': 'sleeping',
+            'conditions': 'condition_booting',
         },
         { 'trigger': 'sleep',
             'source': '*',
+            'dest': 'sleeping',
+            'conditions': 'condition_sleeping',
+        },
+        { 'trigger': 'charge',
+            'source': '*',
             'dest': 'charging',
+            'conditions': 'condition_running',
         },
         { 'trigger': 'freeze',
             'source': '*',
             'dest': 'freezing',
-            'conditions': 'condition_values',
+            'conditions': 'condition_sleeping',
         },
         { 'trigger': 'pump',
-            'source': '*',
-            'dest': 'pumping',
-            'conditions': 'condition_values',
+            'source': 'running',
+            'dest': 'running_pumping',
+            'conditions': 'condition_running',
+        },
+        { 'trigger': 'run',
+            'source': 'charging',
+            'dest': 'running',
+            'conditions': 'condition_running',
+        },
+        { 'trigger': 'wait',
+            'source': 'running',
+            'dest': 'running_waiting',
+            'conditions': 'condition_running',
         },
     ]
 
@@ -146,6 +166,7 @@ class SolarpumpBus(JNTFsmBus):
         self.buses = {}
         self.buses['gpiobus'] = GpioBus(masters=[self], **kwargs)
         self.buses['1wire'] = OnewireBus(masters=[self], **kwargs)
+        self.buses['i2c'] = I2CBus(masters=[self], **kwargs)
         self.check_timer = None
         uuid="{:s}_timer_delay".format(OID)
         self.values[uuid] = self.value_factory['config_integer'](options=self.options, uuid=uuid,
@@ -155,50 +176,108 @@ class SolarpumpBus(JNTFsmBus):
             default=10,
         )
         uuid="{:s}_temperature_freeze".format(OID)
-        self.values[uuid] = self.value_factory['config_integer'](options=self.options, uuid=uuid,
+        self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
             node_uuid=self.uuid,
             help='The feezing temperature.',
-            label='Freeze',
+            label='Temp Freeze',
             default=0,
         )
 
+        uuid="{:s}_temperature_min".format(OID)
+        self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
+            node_uuid=self.uuid,
+            help='The minimum temperature to restart pumping.',
+            label='Temp Min',
+            default=0,
+        )
+
+        uuid="{:s}_battery_critical".format(OID)
+        self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
+            node_uuid=self.uuid,
+            help='The critical level for battery.',
+            label='batt crit',
+            default=11.6,
+        )
+
+        uuid="{:s}_battery_min".format(OID)
+        self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
+            node_uuid=self.uuid,
+            help='The minimal level for battery.',
+            label='batt crit',
+            default=12.5,
+        )
+
+        uuid="{:s}_state".format(OID)
+        self.values[uuid] = self.value_factory['sensor_integer'](options=self.options, uuid=uuid,
+            node_uuid=self.uuid,
+            help='The state of the system : -3 booting -2 sleeping, -1 charging, 0 freezing, 1 waiting, 2 pumping.',
+            label='state',
+            default=-3,
+        )
+        
+        self.thread_start_motor = None
+
     @property
-    def polled_sensors(self):
+    def sleeping_sensors(self):
         """The sensors we will poll
         """
-        return [
+        return self.booting_sensors.union( set( [
             self.nodeman.find_value('temperature', 'temperature'),
+            self.nodeman.find_value('temp_battery', 'temperature'),
+            self.nodeman.find_value('led', 'state'),
             self.nodeman.find_value('ambiancein', 'temperature'),
-            self.nodeman.find_value('ambiancein', 'humidity'),
             self.nodeman.find_value('ambianceout', 'temperature'),
+        ]))
+
+    @property
+    def running_sensors(self):
+        """The sensors we will poll
+        """
+        water_sensors = []
+        if self.nodeman.find_value('level1', 'state') is not None:
+            water_sensors = [
+                self.nodeman.find_value('level1', 'state'),
+                self.nodeman.find_value('level2', 'state'),
+            ]
+        return self.sleeping_sensors.union( set( water_sensors + [
+            self.nodeman.find_value('ambiancein', 'humidity'),
             self.nodeman.find_value('ambianceout', 'humidity'),
             self.nodeman.find_value('cpu', 'temperature'),
             self.nodeman.find_value('cpu', 'voltage'),
             self.nodeman.find_value('cpu', 'frequency'),
-            self.nodeman.find_value('led', 'state'),
             self.nodeman.find_value('pump', 'state'),
             self.nodeman.find_value('inverter', 'state'),
-        ]
+        ]))
 
-    def condition_values(self):
+    @property
+    def booting_sensors(self):
+        """The sensors we will poll at boot
+        """
+        return set([
+            self.nodeman.find_value('battery', 'voltage'),
+            self.nodeman.find_value('solar', 'voltage'),
+        ])
+
+    def condition_booting(self):
         """Return True if all sensors are available
         """
-        polled_sensors = self.polled_sensors
-        logger.debug("[%s] - condition_values sensors : %s", self.__class__.__name__, polled_sensors)
+        polled_sensors = self.booting_sensors
+        logger.debug("[%s] - condition_booting sensors : %s", self.__class__.__name__, polled_sensors)
         return all(v is not None for v in polled_sensors)
 
-    def on_enter_reporting(self):
+    def condition_running(self):
+        """Return True if all sensors are available
         """
+        polled_sensors = self.running_sensors
+        logger.debug("[%s] - condition_running sensors : %s", self.__class__.__name__, polled_sensors)
+        return all(v is not None for v in polled_sensors)
+
+    def condition_sleeping(self):
+        """Return True if all sensors are available
         """
-        logger.debug("[%s] - on_enter_reporting", self.__class__.__name__)
-        self.bus_acquire()
-        try:
-            self.nodeman.find_value('led', 'blink').data = 'heartbeat'
-            self.nodeman.add_polls(self.polled_sensors, slow_start=True, overwrite=False)
-        except Exception:
-            logger.exception("[%s] - Error in on_enter_reporting", self.__class__.__name__)
-        finally:
-            self.bus_release()
+        polled_sensors = self.sleeping_sensors
+        logger.debug("[%s] - condition_sleeping sensors : %s", self.__class__.__name__, polled_sensors)
+        return all(v is not None for v in polled_sensors)
 
     def on_enter_sleeping(self):
         """
@@ -206,30 +285,123 @@ class SolarpumpBus(JNTFsmBus):
         logger.debug("[%s] - on_enter_sleeping", self.__class__.__name__)
         self.bus_acquire()
         try:
-            self.nodeman.remove_polls(self.polled_sensors)
+            self.stop_check()
+            self.nodeman.remove_polls(self.running_sensors - self.sleeping_sensors)
+            self.nodeman.add_polls(self.sleeping_sensors, slow_start=True, overwrite=False)
             self.nodeman.find_value('led', 'blink').data = 'off'
-            self.nodeman.find_bus_value('state').poll_delay = 900
         except Exception:
             logger.exception("[%s] - Error in on_enter_sleeping", self.__class__.__name__)
         finally:
             self.bus_release()
 
-    def on_exit_sleeping(self):
+    def on_enter_booting(self):
         """
         """
-        logger.debug("[%s] - on_exit_sleeping", self.__class__.__name__)
-        self.on_check()
+        logger.info("[%s] - on_enter_booting", self.__class__.__name__)
+        self.bus_acquire()
+        try:
+            self.stop_check()
+            self.nodeman.remove_polls(self.running_sensors - self.sleeping_sensors)
+            self.nodeman.add_polls(self.sleeping_sensors, slow_start=True, overwrite=False)
+            self.nodeman.find_value('led', 'blink').data = 'off'
+            self.get_bus_value('state').data = -3
+        except Exception:
+            logger.exception("[%s] - Error in on_enter_booting", self.__class__.__name__)
+        finally:
+            self.bus_release()
 
-    def on_enter_guarding(self):
+    def on_enter_charging(self):
         """
         """
-        logger.debug("[%s] - on_enter_guarding", self.__class__.__name__)
+        logger.info("[%s] - on_enter_charging", self.__class__.__name__)
+        self.bus_acquire()
+        try:
+            self.nodeman.add_polls(self.sleeping_sensors, slow_start=True, overwrite=False)
+            self.nodeman.find_value('led', 'blink').data = 'off'
+            self.get_bus_value('state').data = -1
+        except Exception:
+            logger.exception("[%s] - Error in on_enter_charging", self.__class__.__name__)
+        finally:
+            self.bus_release()
+        try:
+            if self.check_timer is None and self.is_started:
+                self.check_timer = threading.Timer(self.get_bus_value('timer_delay').data, self.on_check)
+                self.check_timer.start()
+        except Exception:
+            logger.exception("[%s] - Error in on_enter_charging", self.__class__.__name__)
+
+    def on_enter_running(self):
+        """
+        """
+        logger.info("[%s] - on_enter_running", self.__class__.__name__)
+        self.bus_acquire()
+        try:
+            self.nodeman.find_value('led', 'blink').data = 'heartbeat'
+            self.nodeman.add_polls(self.running_sensors, slow_start=True, overwrite=False)
+        except Exception:
+            logger.exception("[%s] - Error in on_enter_running", self.__class__.__name__)
+        finally:
+            self.bus_release()
+
+    def on_enter_freezing(self):
+        """
+        """
+        logger.info("[%s] - on_enter_freezing", self.__class__.__name__)
+        self.bus_acquire()
+        try:
+            self.nodeman.find_value('led', 'blink').data = 'notify'
+            self.get_bus_value('state').data = -1
+        except Exception:
+            logger.exception("[%s] - Error in on_enter_freezing", self.__class__.__name__)
+        finally:
+            self.bus_release()
+
+    def on_enter_running_pumping(self):
+        """ Start the pump system
+        """
+        logger.info("[%s] - on_enter_running_pumping", self.__class__.__name__)
+        self.bus_acquire()
+        try:
+            if self.thread_start_motor is not None:
+                self.thread_start_motor.cancel()
+                self.thread_start_motor = None
+            self.nodeman.find_value('led', 'blink').data = 'info1'
+            self.start_inverter()
+            self.thread_start_motor = threading.Timer(5, self.start_pump)
+            self.thread_start_motor.start()
+            self.get_bus_value('state').data = 2
+        except Exception:
+            logger.exception("[%s] - Error in on_enter_running_pumping", self.__class__.__name__)
+        finally:
+            self.bus_release()
+
+    def on_exit_running_pumping(self):
+        """ Stop the pump system
+        """
+        logger.info("[%s] - on_exit_running_pumping", self.__class__.__name__)
+        self.bus_acquire()
+        try:
+            if self.thread_start_motor is not None:
+                self.thread_start_motor.cancel()
+                self.thread_start_motor = None
+            self.stop_pump()
+            self.thread_start_motor = threading.Timer(5, self.stop_inverter)
+            self.thread_start_motor.start()
+        except Exception:
+            logger.exception("[%s] - Error in on_exit_running_pumping", self.__class__.__name__)
+        finally:
+            self.bus_release()
+
+    def on_enter_running_waiting(self):
+        """ Start the pump system
+        """
+        logger.info("[%s] - on_enter_running_waiting", self.__class__.__name__)
         self.bus_acquire()
         try:
             self.nodeman.find_value('led', 'blink').data = 'info'
-            self.nodeman.add_polls(self.polled_sensors, slow_start=True, overwrite=False)
+            self.get_bus_value('state').data = 1
         except Exception:
-            logger.exception("[%s] - Error in on_enter_guarding", self.__class__.__name__)
+            logger.exception("[%s] - Error in on_enter_running_waiting", self.__class__.__name__)
         finally:
             self.bus_release()
 
@@ -241,53 +413,100 @@ class SolarpumpBus(JNTFsmBus):
             self.check_timer.cancel()
             self.check_timer = None
 
+    def check_tempetatures(self):
+        """Make a check using a timer.
+
+        """
+        #Check the temperatures
+        freeze_temp = self.get_bus_value('temperature_freeze').data
+        min_temp = self.get_bus_value('temperature_min').data
+        temp1 = self.nodeman.find_value('temperature', 'temperature').data
+        temp2 = self.nodeman.find_value('ambianceout', 'temperature').data
+        if temp1 is None:
+            temp1 = temp2
+        if temp2 is None:
+            logger.error("[%s] - Error in on_check : can't find temeprature sensors", self.__class__.__name__)
+        else:
+            temp = ( temp1 + temp2 ) / 2
+            if temp < freeze_temp:
+                self.freeze()
+            if temp > min_temp and self.state == 'freezing':
+                self.charge()
+
+    def check_levels(self):
+        """Make a check using a timer.
+
+        """
+        if self.nodeman.find_value('level1', 'state') is not None:
+            level1 = self.nodeman.find_value('level1', 'state').data
+            level2 = self.nodeman.find_value('level2', 'state').data
+            if level1==0 and level2==1:
+                logger.error("[%s] - Error in on_check : icompatibles values in water levels", self.__class__.__name__)
+            else:
+                if level1 == 0:
+                    self.wait()
+                elif level2 == 1:
+                    self.pump()
+        else:
+            self.pump()
+
+    def check_battery(self):
+        """Make a check using a timer.
+
+        """
+        #Check the temperatures
+        battery_critical = self.get_bus_value('battery_critical').data
+        battery_min = self.get_bus_value('battery_min').data
+        battery = self.nodeman.find_value('battery', 'voltage').data
+        solar = self.nodeman.find_value('solar', 'voltage').data
+        if battery < battery_critical and self.state != 'sleeping':
+            self.sleep()
+        elif battery > battery_min and self.state == 'sleeping':
+            self.wait()
+
     def on_check(self):
         """Make a check using a timer.
 
         """
-        self.bus_acquire()
+        fire_again = True
         try:
             self.stop_check()
-            if self.check_timer is None and self.is_started:
-                self.check_timer = threading.Timer(self.get_bus_value('timer_delay').data)
-                self.check_timer.start()
-            state = True
-            #Check the temperatures
-            critical_temp = self.get_bus_value('temperature_critical').data
-            criticals = 0
-            nums = 0
-            total = 0
-            mini = maxi = None
-            for value in [('temperature', 'temperature'), ('ambiancein', 'temperature'), ('ambianceout', 'temperature'), ('cpu', 'temperature')]:
-                data = self.nodeman.find_value(*value).data
-                if data is None:
-                    #We should notify a sensor problem here.
-                    pass
-                else:
-                    nums += 1
-                    total += data
-                    if data > critical_temp:
-                        criticals += 1
-                    if maxi is None or data > maxi:
-                        maxi = data
-                    if min is None or data < mini:
-                        min = data
-            if criticals > 1:
-                #We should notify a security problem : fire ?
-                pass
-            if maxi - mini > 10:
-                #We should notify a sensor problem here
-                pass
-            if nums != 0:
-                self.get_bus_value('temperature').data = total / nums
-            #Check the proximity sensors
-            critical_proxi = self.get_bus_value('proximity_critical').data
+            self.check_battery()
+            if self.state != 'sleeping':
+                self.check_tempetatures()
+                if self.state == 'charging':
+                    self.check_levels()
+            else:
+                fire_again = False
 
         except Exception:
             logger.exception("[%s] - Error in on_check", self.__class__.__name__)
-        finally:
-            self.bus_release()
-
+        if fire_again and self.check_timer is None and self.is_started:
+            self.check_timer = threading.Timer(self.get_bus_value('timer_delay').data, self.on_check)
+            self.check_timer.start()
+            
+    def start_pump(self):
+        """Start the pump
+        """
+        pass
+        
+    def stop_pump(self):
+        """Stop the pump
+        """
+        self.thread_start_motor = None
+        pass
+        
+    def start_inverter(self):
+        """Start the inverter
+        """
+        pass
+        
+    def stop_inverter(self):
+        """Stop the pump
+        """
+        self.thread_start_motor = None
+        pass
+        
     def start(self, mqttc, trigger_thread_reload_cb=None):
         """Start the bus
         """
@@ -359,6 +578,32 @@ class AdsComponent(Ads1x15Component):
                 **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
+        uuid="voltage"
+        self.values[uuid] = self.value_factory['sensor_integer'](options=self.options, uuid=uuid,
+            node_uuid=self.uuid,
+            help='The voltage',
+            label='voltage',
+            get_data_cb=self.read_data,
+        )
+        poll_value = self.values[uuid].create_poll_value(default=300)
+        self.values[poll_value.uuid] = poll_value
+
+        uuid="multiplier"
+        self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
+            node_uuid=self.uuid,
+            help='The voltage multiplier for A/D',
+            label='mplr',
+            default=1,
+        )
+
+    def read_voltage(self, node_uuid, index):
+        try:
+            ret = self.values['data'].data * self.values['multiplier'].data
+        except Exception:
+            logger.exception('[%s] - Exception when retrieving voltage', self.__class__.__name__)
+            ret = None
+        return ret
+ 
 class TemperatureComponent(DS18B20):
     """ A water temperature component """
 
@@ -380,6 +625,18 @@ class OutputComponent(GpioOut):
         oid = kwargs.pop('oid', '%s.output'%OID)
         name = kwargs.pop('name', "Output")
         GpioOut.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+class InputComponent(GpioIn):
+    """ An input component """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', '%s.input'%OID)
+        name = kwargs.pop('name', "Input")
+        GpioIn.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
                 **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
@@ -413,40 +670,3 @@ class LedComponent(GpioOut):
         """
         """
         self.set_state(node_uuid, index, 0)
-
-#~ class ProximityComponent(SonicComponent):
-    #~ """ A component for a proximity sensor """
-
-    #~ def __init__(self, bus=None, addr=None, **kwargs):
-        #~ """
-        #~ """
-        #~ oid = kwargs.pop('oid', '%s.proximity'%OID)
-        #~ name = kwargs.pop('name', "Proximity sensor")
-        #~ SonicComponent.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
-                #~ **kwargs)
-        #~ logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
-
-#~ class PirComponent(GPIOPir):
-    #~ """ A component for a PIR """
-
-    #~ def __init__(self, bus=None, addr=None, **kwargs):
-        #~ """
-        #~ """
-        #~ oid = kwargs.pop('oid', '%s.pir'%OID)
-        #~ name = kwargs.pop('name', "Pir sensor")
-        #~ GPIOPir.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
-                #~ **kwargs)
-        #~ logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
-
-#~ class LedComponent(GPIOLed):
-    #~ """ A component for a Led (on/off) """
-
-    #~ def __init__(self, bus=None, addr=None, **kwargs):
-        #~ """
-        #~ """
-        #~ oid = kwargs.pop('oid', '%s.led'%OID)
-        #~ name = kwargs.pop('name', "Led")
-        #~ GPIOLed.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
-                #~ **kwargs)
-        #~ logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
-

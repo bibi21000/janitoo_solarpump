@@ -88,6 +88,11 @@ class TestOutputComponent(JNTTComponent, JNTTComponentCommon):
     """
     component_name = "solarpump.output"
 
+class TestInputComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "solarpump.input"
+
 class TestLedComponent(JNTTComponent, JNTTComponentCommon):
     """Test the component
     """
