@@ -39,16 +39,16 @@ from janitoo.value import JNTValue
 from janitoo.component import JNTComponent
 
 from janitoo_factory.buses.fsm import JNTFsmBus
+from janitoo_factory.threads.http import BasicResourceComponent
 
 from janitoo_raspberry_dht.dht import DHTComponent
 from janitoo_raspberry_gpio.gpio import GpioBus, OutputComponent as GpioOut, InputComponent as GpioIn
 from janitoo_raspberry_i2c.bus_i2c import I2CBus
 from janitoo_raspberry_i2c_ds1307.ds1307 import DS1307Component
 from janitoo_raspberry_i2c_ads1x15.ads import ADSComponent as Ads1x15Component
-from janitoo_hostsensor_raspberry.component import HardwareCpu
 from janitoo_raspberry_1wire.bus_1wire import OnewireBus
 from janitoo_raspberry_1wire.components import DS18B20
-
+from janitoo_hostsensor_raspberry.component import HardwareCpu
 
 ##############################################################
 #Check that we are in sync with the official command classes
@@ -91,7 +91,6 @@ def make_led(**kwargs):
     return LedComponent(**kwargs)
 
 def make_http_resource(**kwargs):
-    from janitoo_factory.threads.http import BasicResourceComponent
     return HttpResourceComponent(**kwargs)
 
 #~ def make_pump(**kwargs):
@@ -676,14 +675,17 @@ class LedComponent(GpioOut):
         """
         self.set_state(node_uuid, index, 0)
 
-class RrdResourceComponent(BasicResourceComponent):
+class HttpResourceComponent(BasicResourceComponent):
     """ A resource ie /rrd """
 
     def __init__(self, bus=None, addr=None, **kwargs):
         """
         """
-        BasicResourceComponent.__init__(self, path='solarpump', oid='solarpump.rrd', bus=bus, addr=addr, name="Http solarpump resource",
-                product_name="HTTP solarpump resource", **kwargs)
+        product_name = kwargs.pop('product_name', "HTTP basic resource")
+        name = kwargs.pop('name', "Http basic resource")
+        BasicResourceComponent.__init__(self, path='solarpump', oid='solarpump.http', 
+            bus=bus, addr=addr, name=name,
+            product_name=product_name, **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
     def get_package_name(self):

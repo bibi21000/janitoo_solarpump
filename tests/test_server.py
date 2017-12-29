@@ -133,8 +133,10 @@ class TestDatalogServer(JNTTServer, JNTTServerCommon):
     server_section = "datarrd"
 
     hadds = [ HADD%(220,0), HADD%(220,1), HADD%(220,2), HADD%(220,3),
+              HADD%(220,4), HADD%(220,5), HADD%(220,6), HADD%(220,7),
               HADD%(221,0), HADD%(221,1), HADD%(221,2),
-              HADD%(219,0), HADD%(219,1), HADD%(219,2),
+              HADD%(219,0), HADD%(219,1), HADD%(219,2), HADD%(219,3),
+              HADD%(219,4)
               ]
 
 

@@ -98,6 +98,11 @@ class TestLedComponent(JNTTComponent, JNTTComponentCommon):
     """
     component_name = "solarpump.led"
 
+class TestHttpComponent(JNTTComponent, JNTTComponentCommon):
+    """Test the component
+    """
+    component_name = "solarpump.http"
+
 #~ class TestPirComponent(JNTTComponent, JNTTComponentCommon):
     #~ """Test the component
     #~ """

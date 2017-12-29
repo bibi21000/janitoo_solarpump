@@ -126,7 +126,7 @@ setup(
             "solarpump.output = janitoo_solarpump.solarpump:make_output",
             "solarpump.input = janitoo_solarpump.solarpump:make_input",
             "solarpump.led = janitoo_solarpump.solarpump:make_led",
-            "solarpump.rrd = janitoo_solarpump.solarpump:make_http_resource",
+            "solarpump.http = janitoo_solarpump.solarpump:make_http_resource",
         ],
     },
 )
