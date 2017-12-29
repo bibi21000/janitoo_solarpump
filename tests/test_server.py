@@ -44,7 +44,7 @@ from janitoo.utils import TOPIC_BROADCAST_REPLY, TOPIC_BROADCAST_REQUEST
 from janitoo.utils import TOPIC_VALUES_USER, TOPIC_VALUES_CONFIG, TOPIC_VALUES_SYSTEM, TOPIC_VALUES_BASIC
 from janitoo.thread import JNTBusThread
 
-from janitoo_solarpump.server import SolarpumpServer
+from janitoo_solarpump.server import SolarpumpServer, DatalogServer
 
 ##############################################################
 #Check that we are in sync with the official command classes
@@ -120,3 +120,51 @@ class TestSolarpumpServer(JNTTServer, JNTTServerCommon):
         time.sleep(1)
         bus.sleep()
         time.sleep(1)
+
+class TestDatalogServer(JNTTServer, JNTTServerCommon):
+    """Test the pi server
+    """
+    loglevel = logging.DEBUG
+    path = '/tmp/janitoo_test'
+    broker_user = 'toto'
+    broker_password = 'toto'
+    server_class = DatalogServer
+    server_conf = "tests/data/janitoo_datalog.conf"
+    server_section = "datarrd"
+
+    hadds = [ HADD%(220,0), HADD%(220,1), HADD%(220,2), HADD%(220,3),
+              HADD%(221,0), HADD%(221,1), HADD%(221,2),
+              HADD%(219,0), HADD%(219,1), HADD%(219,2),
+              ]
+
+
+    def test_040_server_start_no_error_in_log(self):
+        self.start()
+        time.sleep(5)
+        for th in ['datarrd', "http", 'hostsensor']:
+            
+            print("Look for thread %s"%self.server_section)
+            thread = self.server.find_thread(th)
+            self.assertNotEqual(thread, None)
+            self.assertIsInstance(thread, JNTBusThread)
+        self.waitHeartbeatNodes(hadds=self.hadds)
+        time.sleep(self.longdelay)
+        self.assertNotInLogfile('^ERROR ')
+        #~ self.assertInLogfile('Start the server')
+        #~ self.assertInLogfile('Connected to broker')
+        #~ self.assertInLogfile('Found heartbeats in timeout')
+        print("Reload server")
+        self.server.reload()
+        time.sleep(5)
+        self.waitHeartbeatNodes(hadds=self.hadds)
+        time.sleep(self.shortdelay)
+        self.assertNotInLogfile('^ERROR ')
+        #~ self.assertInLogfile('Reload the server')
+        print("Reload threads")
+        self.server.reload_threads()
+        time.sleep(5)
+        self.waitHeartbeatNodes(hadds=self.hadds)
+        time.sleep(self.shortdelay)
+        self.assertNotInLogfile('^ERROR ')
+        self.assertFile("/tmp/janitoo_test/home/public/solarpump/power.html")
+

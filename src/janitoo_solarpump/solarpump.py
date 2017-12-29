@@ -49,6 +49,7 @@ from janitoo_hostsensor_raspberry.component import HardwareCpu
 from janitoo_raspberry_1wire.bus_1wire import OnewireBus
 from janitoo_raspberry_1wire.components import DS18B20
 
+
 ##############################################################
 #Check that we are in sync with the official command classes
 #Must be implemented for non-regression
@@ -88,6 +89,10 @@ def make_input(**kwargs):
 
 def make_led(**kwargs):
     return LedComponent(**kwargs)
+
+def make_http_resource(**kwargs):
+    from janitoo_factory.threads.http import BasicResourceComponent
+    return HttpResourceComponent(**kwargs)
 
 #~ def make_pump(**kwargs):
     #~ return PumpComponent(**kwargs)
@@ -431,7 +436,7 @@ class SolarpumpBus(JNTFsmBus):
             if temp < freeze_temp:
                 self.freeze()
             if temp > min_temp and self.state == 'freezing':
-                self.charge()
+                self.sleep()
 
     def check_levels(self):
         """Make a check using a timer.
@@ -441,7 +446,7 @@ class SolarpumpBus(JNTFsmBus):
             level1 = self.nodeman.find_value('level1', 'state').data
             level2 = self.nodeman.find_value('level2', 'state').data
             if level1==0 and level2==1:
-                logger.error("[%s] - Error in on_check : icompatibles values in water levels", self.__class__.__name__)
+                logger.error("[%s] - Error in on_check : incompatibles values in water levels", self.__class__.__name__)
             else:
                 if level1 == 0:
                     self.wait()
@@ -462,7 +467,7 @@ class SolarpumpBus(JNTFsmBus):
         if battery < battery_critical and self.state != 'sleeping':
             self.sleep()
         elif battery > battery_min and self.state == 'sleeping':
-            self.wait()
+            self.charge()
 
     def on_check(self):
         """Make a check using a timer.
@@ -655,7 +660,7 @@ class LedComponent(GpioOut):
             node_uuid=self.uuid,
             help='The led to report state of the system.',
             label='LED',
-            default=0,
+            default='off',
             blink_off_cb=self.blink_off,
             blink_on_cb=self.blink_off,
         )
@@ -670,3 +675,25 @@ class LedComponent(GpioOut):
         """
         """
         self.set_state(node_uuid, index, 0)
+
+class RrdResourceComponent(BasicResourceComponent):
+    """ A resource ie /rrd """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        BasicResourceComponent.__init__(self, path='solarpump', oid='solarpump.rrd', bus=bus, addr=addr, name="Http solarpump resource",
+                product_name="HTTP solarpump resource", **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+
+    def get_package_name(self):
+        """Return the name of the package. Needed to publish static files
+
+        **MUST** be copy paste in every extension that publish statics files
+        """
+        return __package__
+
+    def check_heartbeat(self):
+        """Check that the component is 'available'
+        """
+        return self.check_heartbeat_file('solarpump')

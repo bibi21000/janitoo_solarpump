@@ -55,3 +55,9 @@ class SolarpumpServer(PiServer):
 
     """
     pass
+
+class DatalogServer(PiServer):
+    """The Raspberry pi Server
+
+    """
+    pass

@@ -53,6 +53,7 @@ def data_files_config(res, rsrc, src, pattern):
 
 data_files = []
 data_files_config(data_files, 'docs','src/docs/','*')
+data_files_config(data_files, 'public','src/public/','*')
 
 setup(
     name = 'janitoo_solarpump',
@@ -96,6 +97,7 @@ setup(
                      'janitoo_raspberry_i2c_ads1x15',
                      'janitoo_hostsensor',
                      'janitoo_hostsensor_raspberry',
+                     'janitoo_hostsensor_psutil',
                      'janitoo_raspberry_1wire',
                       ],
     dependency_links = [
@@ -108,6 +110,7 @@ setup(
       'https://github.com/bibi21000/janitoo_raspberry_i2c_ads1x15/archive/master.zip#egg=janitoo_raspberry_i2c_ads1x15',
       'https://github.com/bibi21000/janitoo_hostsensor/archive/master.zip#egg=janitoo_hostsensor',
       'https://github.com/bibi21000/janitoo_hostsensor_raspberry/archive/master.zip#egg=janitoo_hostsensor_raspberry',
+      'https://github.com/bibi21000/janitoo_hostsensor_psutil/archive/master.zip#egg=janitoo_hostsensor_psutil',
       'https://github.com/bibi21000/janitoo_raspberry_1wire/archive/master.zip#egg=janitoo_raspberry_1wire',
     ],
     entry_points = {
@@ -123,6 +126,7 @@ setup(
             "solarpump.output = janitoo_solarpump.solarpump:make_output",
             "solarpump.input = janitoo_solarpump.solarpump:make_input",
             "solarpump.led = janitoo_solarpump.solarpump:make_led",
+            "solarpump.rrd = janitoo_solarpump.solarpump:make_http_resource",
         ],
     },
 )
