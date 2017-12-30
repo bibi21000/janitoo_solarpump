@@ -80,7 +80,7 @@ class TestSolarpumpServer(JNTTServer, JNTTServerCommon):
         JNTTServerCommon.test_012_start_reload_threads_stop(self)
 
     def test_040_server_start_no_error_in_log(self):
-        self.skipRasperryTest()
+        self.onlyRasperryTest()
         JNTTServerCommon.test_040_server_start_no_error_in_log(self)
 
     def test_100_server_start_machine_state(self):
@@ -162,10 +162,11 @@ class TestDatalogServer(JNTTServer, JNTTServerCommon):
         self.waitHeartbeatNodes(hadds=self.hadds)
         time.sleep(self.shortdelay)
         self.assertNotInLogfile('^ERROR ')
+        time.sleep(5)
         #~ self.assertInLogfile('Reload the server')
         print("Reload threads")
         self.server.reload_threads()
-        time.sleep(5)
+        time.sleep(25)
         self.waitHeartbeatNodes(hadds=self.hadds)
         time.sleep(self.shortdelay)
         self.assertNotInLogfile('^ERROR ')
