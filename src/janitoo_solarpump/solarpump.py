@@ -26,17 +26,10 @@ __copyright__ = "Copyright © 2013-2014-2015-2016 Sébastien GALLET aka bibi2100
 
 import logging
 logger = logging.getLogger(__name__)
-import os, sys
+import os
 import threading
-import datetime
 
-from janitoo.fsm import HierarchicalMachine as Machine
-from janitoo.thread import JNTBusThread, BaseThread
-from janitoo.options import get_option_autostart
-from janitoo.utils import HADD
-from janitoo.node import JNTNode
-from janitoo.value import JNTValue
-from janitoo.component import JNTComponent
+from janitoo.thread import JNTBusThread
 
 from janitoo_factory.buses.fsm import JNTFsmBus
 from janitoo_factory.threads.http import BasicResourceComponent
@@ -462,7 +455,6 @@ class SolarpumpBus(JNTFsmBus):
         battery_critical = self.get_bus_value('battery_critical').data
         battery_min = self.get_bus_value('battery_min').data
         battery = self.nodeman.find_value('battery', 'voltage').data
-        solar = self.nodeman.find_value('solar', 'voltage').data
         if battery < battery_critical and self.state != 'sleeping':
             self.sleep()
         elif battery > battery_min and self.state == 'sleeping':
@@ -498,7 +490,6 @@ class SolarpumpBus(JNTFsmBus):
         """Stop the pump
         """
         self.thread_start_motor = None
-        pass
         
     def start_inverter(self):
         """Start the inverter
@@ -509,7 +500,6 @@ class SolarpumpBus(JNTFsmBus):
         """Stop the pump
         """
         self.thread_start_motor = None
-        pass
         
     def start(self, mqttc, trigger_thread_reload_cb=None):
         """Start the bus

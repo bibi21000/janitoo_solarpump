@@ -23,17 +23,12 @@ __author__ = 'Sébastien GALLET aka bibi21000'
 __email__ = 'bibi21000@gmail.com'
 __copyright__ = "Copyright © 2013-2014-2015-2016 Sébastien GALLET aka bibi21000"
 
-import platform
-
 # Set default logging handler to avoid "No handler found" warnings.
 import logging
 logger = logging.getLogger(__name__)
-import os, sys
-import threading
-from pkg_resources import get_distribution, DistributionNotFound
-from janitoo.mqtt import MQTTClient
-from janitoo.server import JNTServer, JNTControllerManager
-from janitoo.utils import JanitooException
+import os
+from pkg_resources import DistributionNotFound
+from janitoo.server import JNTServer
 from janitoo_raspberry.server import PiServer
 
 ##############################################################
