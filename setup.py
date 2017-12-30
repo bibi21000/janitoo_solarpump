@@ -84,7 +84,6 @@ setup(
     packages = find_packages('src', exclude=["scripts", "docs", "config", "public"]),
     package_dir = { '': 'src' },
     keywords = "raspberry",
-    include_package_data=True,
     data_files = data_files,
     install_requires=[
                      'janitoo',
