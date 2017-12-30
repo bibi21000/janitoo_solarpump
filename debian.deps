@@ -1,1 +1,1 @@
-libcairo2-dev libpango1.0-dev libglib2.0-dev libxml2-dev librrd-dev
+libcairo2-dev libpango1.0-dev libglib2.0-dev libxml2-dev librrd-dev python-smbus i2c-tools python2.7-dev python2.7 python-all-dev python-all graphviz-dev python-pip git build-essential libwrap0-dev libc-ares-dev
