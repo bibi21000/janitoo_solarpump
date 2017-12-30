@@ -100,6 +100,7 @@ setup(
                      'janitoo_hostsensor_psutil',
                      'janitoo_raspberry_1wire',
                      'janitoo_datalog_rrd',
+                     'python-rrdtool',
                       ],
     dependency_links = [
       'https://github.com/bibi21000/janitoo/archive/master.zip#egg=janitoo',
@@ -114,6 +115,7 @@ setup(
       'https://github.com/bibi21000/janitoo_hostsensor_psutil/archive/master.zip#egg=janitoo_hostsensor_psutil',
       'https://github.com/bibi21000/janitoo_raspberry_1wire/archive/master.zip#egg=janitoo_raspberry_1wire',
       'https://github.com/bibi21000/janitoo_datalog_rrd/archive/master.zip#egg=janitoo_datalog_rrd',
+      'https://github.com/kyokenn/python-rrdtool/archive/master.zip#egg=python-rrdtool',
     ],
     entry_points = {
         "janitoo.threads": [
