@@ -681,9 +681,9 @@ class HttpResourceComponent(BasicResourceComponent):
     def __init__(self, bus=None, addr=None, **kwargs):
         """
         """
-        product_name = kwargs.pop('product_name', "HTTP basic resource")
-        name = kwargs.pop('name', "Http basic resource")
-        BasicResourceComponent.__init__(self, path='solarpump', oid='solarpump.http', 
+        product_name = kwargs.pop('product_name', "HTTP solarpump resource")
+        name = kwargs.pop('name', "Http solarpump resource")
+        BasicResourceComponent.__init__(self, path='solarpump', oid='http.solarpump', 
             bus=bus, addr=addr, name=name,
             product_name=product_name, **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)

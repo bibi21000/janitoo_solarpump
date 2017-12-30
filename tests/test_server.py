@@ -141,6 +141,7 @@ class TestDatalogServer(JNTTServer, JNTTServerCommon):
 
 
     def test_040_server_start_no_error_in_log(self):
+        self.onlyCITest()
         self.start()
         time.sleep(5)
         for th in ['datarrd', "http", 'hostsensor']:
@@ -168,5 +169,8 @@ class TestDatalogServer(JNTTServer, JNTTServerCommon):
         self.waitHeartbeatNodes(hadds=self.hadds)
         time.sleep(self.shortdelay)
         self.assertNotInLogfile('^ERROR ')
+        self.assertFile("/tmp/janitoo_test/home/public/rrd/index.html")
         self.assertFile("/tmp/janitoo_test/home/public/solarpump/power.html")
+        self.assertFile("/tmp/janitoo_test/home/public/rrd/rrds/load.rrd")
+        self.assertFile("/tmp/janitoo_test/home/public/rrd/rrds/power.rrd")
 
