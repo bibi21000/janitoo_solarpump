@@ -43,7 +43,7 @@ from janitoo.utils import HADD_SEP, HADD
 
 from janitoo_solarpump.server import SolarpumpServer, DatalogServer
 
-class TestSolarpumpServer(JNTTServer, JNTTServerCommon):
+class TestSolarpumpServer(JNTTDockerServer, JNTTDockerServerCommon):
     """Test the pi server
     """
     loglevel = logging.DEBUG
@@ -61,7 +61,7 @@ class TestSolarpumpServer(JNTTServer, JNTTServerCommon):
     def test_040_server_start_no_error_in_log(self):
         JNTTDockerServerCommon.minimal_040_server_start_reload_restart(self)
 
-class TestDatalogServer(JNTTServer, JNTTServerCommon):
+class TestDatalogServer(JNTTDockerServer, JNTTDockerServerCommon):
     """Test the pi server
     """
     loglevel = logging.DEBUG
