@@ -128,6 +128,7 @@ class TestSolarpumpThread(JNTTThreadRun, JNTTThreadRunCommon):
                 'temp1' : 10,
                 'temp2' : 11,
                 'temp_battery' : 12,
+                'fan_temp' : 12,
                 'level1' : 0,
                 'level2' : 0,
                 'battery' : 13,

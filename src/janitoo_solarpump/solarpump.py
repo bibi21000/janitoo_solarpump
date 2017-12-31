@@ -195,11 +195,19 @@ class SolarpumpBus(JNTFsmBus):
             default=4,
         )
 
+        uuid="{:s}_temperature_fan".format(OID)
+        self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
+            node_uuid=self.uuid,
+            help='The minimum temperature to start fans.',
+            label='Temp fan',
+            default=4,
+        )
+
         uuid="{:s}_battery_critical".format(OID)
         self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
             node_uuid=self.uuid,
             help='The critical level for battery.',
-            label='batt crit',
+            label='Batt crit',
             default=11.6,
             unit='V',
         )
@@ -239,13 +247,17 @@ class SolarpumpBus(JNTFsmBus):
     def running_sensors(self):
         """The sensors we will poll
         """
-        water_sensors = []
+        opt_sensors = []
         if self.nodeman.find_value('level1', 'state') is not None:
-            water_sensors = [
+            opt_sensors = [
                 self.nodeman.find_value('level1', 'state'),
                 self.nodeman.find_value('level2', 'state'),
             ]
-        return self.sleeping_sensors.union( set( water_sensors + [
+        if self.nodeman.find_value('fan', 'state') is not None:
+            opt_sensors.append(self.nodeman.find_value('fan', 'state')
+        if self.nodeman.find_value('fan_battery', 'state') is not None:
+            opt_sensors.append(self.nodeman.find_value('fan_battery', 'state')
+        return self.sleeping_sensors.union( set( opt_sensors + [
             self.nodeman.find_value('ambiancein', 'humidity'),
             self.nodeman.find_value('ambianceout', 'humidity'),
             self.nodeman.find_value('cpu', 'temperature'),
@@ -441,6 +453,10 @@ class SolarpumpBus(JNTFsmBus):
 
         """
         #Check the temperatures
+        fan_temp = kwargs.get('fan_temp', None)
+        if fan_temp is None:
+            fan_temp = self.get_bus_value('temperature_fan').data
+        min_temp = kwargs.get('min_temp', None)
         freeze_temp = kwargs.get('freeze_temp', None)
         if freeze_temp is None:
             freeze_temp = self.get_bus_value('temperature_freeze').data
