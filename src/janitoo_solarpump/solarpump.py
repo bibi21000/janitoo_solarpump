@@ -254,9 +254,9 @@ class SolarpumpBus(JNTFsmBus):
                 self.nodeman.find_value('level2', 'state'),
             ]
         if self.nodeman.find_value('fan', 'state') is not None:
-            opt_sensors.append(self.nodeman.find_value('fan', 'state')
+            opt_sensors.append(self.nodeman.find_value('fan', 'state'))
         if self.nodeman.find_value('fan_battery', 'state') is not None:
-            opt_sensors.append(self.nodeman.find_value('fan_battery', 'state')
+            opt_sensors.append(self.nodeman.find_value('fan_battery', 'state'))
         return self.sleeping_sensors.union( set( opt_sensors + [
             self.nodeman.find_value('ambiancein', 'humidity'),
             self.nodeman.find_value('ambianceout', 'humidity'),
