@@ -96,15 +96,15 @@ class TestSolarpumpThread(JNTTThreadRun, JNTTThreadRunCommon):
         self.thread.bus.run()
         time.sleep(1)
         self.thread.bus.pump()
-        time.sleep(10)
+        time.sleep(6)
         self.thread.bus.charge()
         time.sleep(1)
         self.thread.bus.run()
         time.sleep(1)
         self.thread.bus.wait()
-        time.sleep(10)
+        time.sleep(6)
         self.thread.bus.freeze()
-        time.sleep(10)
+        time.sleep(6)
         self.thread.bus.sleep()
         time.sleep(1)
         self.thread.bus.charge()
@@ -124,5 +124,76 @@ class TestSolarpumpThread(JNTTThreadRun, JNTTThreadRunCommon):
 
     def test_104_on_check(self):
         self.wait_for_nodeman()
-        self.thread.bus.on_check()
-        time.sleep(5)
+        allargs = {
+                'temp1' : 10,
+                'temp2' : 11,
+                'temp_battery' : 12,
+                'level1' : 0,
+                'level2' : 0,
+                'battery' : 13,
+                'solar' : 13,
+                'fire_again' : False,
+        }
+        print(allargs)
+        self.thread.bus.on_check(**allargs)
+        time.sleep(1)
+        self.assertEqual( 'charging', self.thread.bus.state)
+        self.thread.bus.on_check(**allargs)
+        time.sleep(1)
+        self.assertEqual( 'running_waiting', self.thread.bus.state)
+        #Battery is low, we must wait for the sun
+        allargs['battery'] = 12
+        print(allargs)
+        self.thread.bus.on_check(**allargs)
+        time.sleep(1)
+        self.assertEqual( 'charging', self.thread.bus.state)
+        #Temp is low, we must wait for the sun
+        allargs['temp1'] = -3
+        allargs['temp2'] = -3
+        print(allargs)
+        self.thread.bus.on_check(**allargs)
+        time.sleep(1)
+        self.assertEqual( 'freezing', self.thread.bus.state)
+        #Temp is high, we must wait for the sun
+        allargs['temp1'] = 14
+        allargs['temp2'] = 11
+        print(allargs)
+        self.thread.bus.on_check(**allargs)
+        time.sleep(1)
+        self.assertEqual( 'charging', self.thread.bus.state)
+        #Battery is high, we must wait for the rain
+        allargs['battery'] = 13
+        print(allargs)
+        self.thread.bus.on_check(**allargs)
+        time.sleep(1)
+        self.assertEqual( 'running_waiting', self.thread.bus.state)
+        #Water is herrrrrreeeeee
+        allargs['level1'] = 1
+        allargs['level2'] = 1
+        print(allargs)
+        self.thread.bus.on_check(**allargs)
+        time.sleep(1)
+        self.assertEqual( 'running_pumping', self.thread.bus.state)
+        self.thread.bus.on_check(**allargs)
+        time.sleep(1)
+        self.assertEqual( 'running_pumping', self.thread.bus.state)
+        #Water is gone
+        allargs['level1'] = 0
+        allargs['level2'] = 0
+        print(allargs)
+        self.thread.bus.on_check(**allargs)
+        time.sleep(1)
+        self.assertEqual( 'running_waiting', self.thread.bus.state)
+        #Batteri is critcal
+        allargs['battery'] = 10
+        print(allargs)
+        self.thread.bus.on_check(**allargs)
+        time.sleep(1)
+        self.assertEqual( 'sleeping', self.thread.bus.state)
+        #Temp is low, we must stay in sleeping
+        allargs['temp1'] = -3
+        allargs['temp2'] = -3
+        print(allargs)
+        self.thread.bus.on_check(**allargs)
+        time.sleep(1)
+        self.assertEqual( 'sleeping', self.thread.bus.state)

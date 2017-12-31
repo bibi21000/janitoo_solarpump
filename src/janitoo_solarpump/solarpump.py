@@ -102,6 +102,7 @@ class SolarpumpBus(JNTFsmBus):
 
     states = [
        'booting',
+       'halted',
        'sleeping',
        'charging',
        'freezing',
@@ -124,6 +125,10 @@ class SolarpumpBus(JNTFsmBus):
             'dest': 'sleeping',
             'conditions': 'condition_booting',
         },
+        { 'trigger': 'halt',
+            'source': '*',
+            'dest': 'halted',
+        },
         { 'trigger': 'sleep',
             'source': '*',
             'dest': 'sleeping',
@@ -140,7 +145,7 @@ class SolarpumpBus(JNTFsmBus):
             'conditions': 'condition_sleeping',
         },
         { 'trigger': 'pump',
-            'source': 'running',
+            'source': ['running','charging'],
             'dest': 'running_pumping',
             'conditions': 'condition_running',
         },
@@ -150,7 +155,7 @@ class SolarpumpBus(JNTFsmBus):
             'conditions': 'condition_running',
         },
         { 'trigger': 'wait',
-            'source': 'running',
+            'source': ['running','charging'],
             'dest': 'running_waiting',
             'conditions': 'condition_running',
         },
@@ -165,19 +170,21 @@ class SolarpumpBus(JNTFsmBus):
         self.buses['1wire'] = OnewireBus(masters=[self], **kwargs)
         self.buses['i2c'] = I2CBus(masters=[self], **kwargs)
         self.check_timer = None
+ 
+        timer_delay = kwargs.get('timer_delay', 10)
         uuid="{:s}_timer_delay".format(OID)
         self.values[uuid] = self.value_factory['config_integer'](options=self.options, uuid=uuid,
             node_uuid=self.uuid,
             help='The delay between 2 checks',
             label='Timer.',
-            default=10,
+            default=timer_delay,
         )
         uuid="{:s}_temperature_freeze".format(OID)
         self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
             node_uuid=self.uuid,
             help='The feezing temperature.',
             label='Temp Freeze',
-            default=0,
+            default=-1,
         )
 
         uuid="{:s}_temperature_min".format(OID)
@@ -185,7 +192,7 @@ class SolarpumpBus(JNTFsmBus):
             node_uuid=self.uuid,
             help='The minimum temperature to restart pumping.',
             label='Temp Min',
-            default=0,
+            default=4,
         )
 
         uuid="{:s}_battery_critical".format(OID)
@@ -194,14 +201,16 @@ class SolarpumpBus(JNTFsmBus):
             help='The critical level for battery.',
             label='batt crit',
             default=11.6,
+            unit='V',
         )
 
         uuid="{:s}_battery_min".format(OID)
         self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
             node_uuid=self.uuid,
             help='The minimal level for battery.',
-            label='batt crit',
+            label='batt min',
             default=12.5,
+            unit='V',
         )
 
         uuid="{:s}_state".format(OID)
@@ -282,12 +291,27 @@ class SolarpumpBus(JNTFsmBus):
         logger.debug("[%s] - on_enter_sleeping", self.__class__.__name__)
         self.bus_acquire()
         try:
-            self.stop_check()
             self.nodeman.remove_polls(self.running_sensors - self.sleeping_sensors)
             self.nodeman.add_polls(self.sleeping_sensors, slow_start=True, overwrite=False)
             self.nodeman.find_value('led', 'blink').data = 'off'
         except Exception:
             logger.exception("[%s] - Error in on_enter_sleeping", self.__class__.__name__)
+        finally:
+            self.bus_release()
+        self.start_check()
+
+    def on_enter_halted(self):
+        """
+        """
+        logger.info("[%s] - on_enter_halted", self.__class__.__name__)
+        self.bus_acquire()
+        try:
+            self.stop_check()
+            self.nodeman.remove_polls(self.running_sensors)
+            self.nodeman.find_value('led', 'blink').data = 'off'
+            self.get_bus_value('state').data = -4
+        except Exception:
+            logger.exception("[%s] - Error in on_enter_halted", self.__class__.__name__)
         finally:
             self.bus_release()
 
@@ -320,12 +344,6 @@ class SolarpumpBus(JNTFsmBus):
             logger.exception("[%s] - Error in on_enter_charging", self.__class__.__name__)
         finally:
             self.bus_release()
-        try:
-            if self.check_timer is None and self.is_started:
-                self.check_timer = threading.Timer(self.get_bus_value('timer_delay').data, self.on_check)
-                self.check_timer.start()
-        except Exception:
-            logger.exception("[%s] - Error in on_enter_charging", self.__class__.__name__)
 
     def on_enter_running(self):
         """
@@ -410,34 +428,59 @@ class SolarpumpBus(JNTFsmBus):
             self.check_timer.cancel()
             self.check_timer = None
 
-    def check_tempetatures(self):
+    def start_check(self):
+        """Check that the component is 'available'
+
+        """
+        if self.check_timer is None and self.is_started and self.get_bus_value('timer_delay').data != 0:
+            self.check_timer = threading.Timer(self.get_bus_value('timer_delay').data, self.on_check)
+            self.check_timer.start()
+
+    def check_temperatures(self, **kwargs):
         """Make a check using a timer.
 
         """
         #Check the temperatures
-        freeze_temp = self.get_bus_value('temperature_freeze').data
-        min_temp = self.get_bus_value('temperature_min').data
-        temp1 = self.nodeman.find_value('temperature', 'temperature').data
-        temp2 = self.nodeman.find_value('ambianceout', 'temperature').data
+        freeze_temp = kwargs.get('freeze_temp', None)
+        if freeze_temp is None:
+            freeze_temp = self.get_bus_value('temperature_freeze').data
+        min_temp = kwargs.get('min_temp', None)
+        if min_temp is None:
+            min_temp = self.get_bus_value('temperature_min').data
+        temp1 = kwargs.get('temp1', None)
+        if temp1 is None:
+            temp1 = self.nodeman.find_value('temperature', 'temperature').data
+        temp2 = kwargs.get('temp2', None)
+        if temp2 is None:
+            temp2 = self.nodeman.find_value('ambianceout', 'temperature').data
+        temp_battery = kwargs.get('temp_battery', None)
+        if temp_battery is None:
+            temp_battery = self.nodeman.find_value('temp_battery', 'temperature').data
+
         if temp1 is None:
             temp1 = temp2
         if temp2 is None:
             logger.error("[%s] - Error in on_check : can't find temeprature sensors", self.__class__.__name__)
         else:
             temp = ( temp1 + temp2 ) / 2
-            if temp < freeze_temp:
+            if temp < freeze_temp and self.state != 'sleeping':
                 self.freeze()
             if temp > min_temp and self.state == 'freezing':
                 self.sleep()
 
-    def check_levels(self):
+    def check_levels(self, **kwargs):
         """Make a check using a timer.
 
         """
-        if self.nodeman.find_value('level1', 'state') is not None:
+        level1 = kwargs.get('level1', None)
+        if level1 is None:
             level1 = self.nodeman.find_value('level1', 'state').data
-            level2 = self.nodeman.find_value('level2', 'state').data
+        if level1 is not None:
+            level2 = kwargs.get('level2', None)
+            if level2 is None:
+                level2 = self.nodeman.find_value('level2', 'state').data
             if level1==0 and level2==1:
+                self.wait()
                 logger.error("[%s] - Error in on_check : incompatibles values in water levels", self.__class__.__name__)
             else:
                 if level1 == 0:
@@ -447,39 +490,56 @@ class SolarpumpBus(JNTFsmBus):
         else:
             self.pump()
 
-    def check_battery(self):
+    def check_battery(self, **kwargs):
         """Make a check using a timer.
 
         """
         #Check the temperatures
-        battery_critical = self.get_bus_value('battery_critical').data
-        battery_min = self.get_bus_value('battery_min').data
-        battery = self.nodeman.find_value('battery', 'voltage').data
-        if battery < battery_critical and self.state != 'sleeping':
+        battery_critical = kwargs.get('battery_critical', None)
+        if battery_critical is None:
+            battery_critical = self.get_bus_value('battery_critical').data
+        battery_min = kwargs.get('battery_min', None)
+        if battery_min is None:
+            battery_min = self.get_bus_value('battery_min').data
+        battery = kwargs.get('battery', None)
+        if battery is None:
+            battery = self.nodeman.find_value('battery', 'voltage').data
+            
+        if battery < battery_critical:
             self.sleep()
-        elif battery > battery_min and self.state == 'sleeping':
+        elif battery < battery_min:
             self.charge()
+        elif battery > battery_min + 0.2:
+            if self.state == 'sleeping':
+                self.charge()
+            elif self.state == 'charging':
+                self.run()
 
-    def on_check(self):
+    def on_check(self, **kwargs):
         """Make a check using a timer.
 
         """
         fire_again = True
+        delay_mult = 1
+        
         try:
             self.stop_check()
-            self.check_battery()
+            self.check_battery(**kwargs)
             if self.state != 'sleeping':
-                self.check_tempetatures()
-                if self.state == 'charging':
-                    self.check_levels()
+                self.check_temperatures(**kwargs)
+                if self.state in ['running', 'running_pumping', 'running_waiting']:
+                    self.check_levels(**kwargs)
             else:
                 fire_again = False
-
+            if self.state == 'sleeping':
+                delay_mult = 3
         except Exception:
             logger.exception("[%s] - Error in on_check", self.__class__.__name__)
-        if fire_again and self.check_timer is None and self.is_started:
-            self.check_timer = threading.Timer(self.get_bus_value('timer_delay').data, self.on_check)
-            self.check_timer.start()
+
+        fire_again = kwargs.get('fire_again', fire_again)
+        timer_delay = kwargs.get('timer_delay', self.get_bus_value('timer_delay').data)
+        if fire_again:
+            self.start_check()
             
     def start_pump(self):
         """Start the pump
@@ -501,20 +561,21 @@ class SolarpumpBus(JNTFsmBus):
         """
         self.thread_start_motor = None
         
-    def start(self, mqttc, trigger_thread_reload_cb=None):
+    def start(self, mqttc, trigger_thread_reload_cb=None, **kwargs):
         """Start the bus
         """
         for bus in self.buses:
             self.buses[bus].start(mqttc, trigger_thread_reload_cb=None)
-        JNTFsmBus.start(self, mqttc, trigger_thread_reload_cb)
+        JNTFsmBus.start(self, mqttc, trigger_thread_reload_cb, **kwargs)
 
-    def stop(self):
+    def stop(self, **kwargs):
         """Stop the bus
         """
         self.stop_check()
+        self.halt()
         for bus in self.buses:
             self.buses[bus].stop()
-        JNTFsmBus.stop(self)
+        JNTFsmBus.stop(self, **kwargs)
 
     def loop(self, stopevent):
         """Retrieve data
