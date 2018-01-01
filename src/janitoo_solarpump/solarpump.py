@@ -294,7 +294,7 @@ class SolarpumpBus(JNTFsmBus):
         """
         """
         logger.debug("[%s] - on_enter_sleeping", self.__class__.__name__)
-        self.fsm_fsm_bus_acquire()
+        self.fsm_bus_acquire()
         try:
             self.nodeman.remove_polls(self.running_sensors - self.sleeping_sensors)
             self.nodeman.add_polls(self.sleeping_sensors, slow_start=True, overwrite=False)
@@ -313,7 +313,7 @@ class SolarpumpBus(JNTFsmBus):
         """
         """
         logger.info("[%s] - on_enter_halted", self.__class__.__name__)
-        self.fsm_fsm_bus_acquire()
+        self.fsm_bus_acquire()
         try:
             self.stop_check()
             self.nodeman.remove_polls(self.running_sensors)
@@ -613,8 +613,11 @@ class SolarpumpBus(JNTFsmBus):
         """Stop the bus
         """
         self.stop_check()
-        for bus in self.buses:
-            self.buses[bus].stop()
+        try:
+            self.publish_state()
+        except Exception:
+            logger.exception("[%s] - Error when publishing state", self.__class__.__name__)
+        self.stop_buses(self.buses, **kwargs)
         JNTFsmBus.stop(self, **kwargs)
 
     def loop(self, stopevent):
