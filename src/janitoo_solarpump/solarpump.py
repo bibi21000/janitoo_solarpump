@@ -230,6 +230,7 @@ class SolarpumpBus(JNTFsmBus):
         )
         
         self.thread_start_motor = None
+        self.thread_fan = None
 
     @property
     def sleeping_sensors(self):
