@@ -220,14 +220,6 @@ class SolarpumpBus(JNTFsmBus):
             default=12.5,
             unit='V',
         )
-
-        uuid="{:s}_state".format(OID)
-        self.values[uuid] = self.value_factory['sensor_integer'](options=self.options, uuid=uuid,
-            node_uuid=self.uuid,
-            help='The state of the system : -3 booting -2 sleeping, -1 charging, 0 freezing, 1 waiting, 2 pumping.',
-            label='state',
-            default=-3,
-        )
         
         self.thread_start_motor = None
         self.thread_fan = None
@@ -302,7 +294,7 @@ class SolarpumpBus(JNTFsmBus):
         """
         """
         logger.debug("[%s] - on_enter_sleeping", self.__class__.__name__)
-        self.bus_acquire()
+        self.fsm_fsm_bus_acquire()
         try:
             self.nodeman.remove_polls(self.running_sensors - self.sleeping_sensors)
             self.nodeman.add_polls(self.sleeping_sensors, slow_start=True, overwrite=False)
@@ -310,14 +302,18 @@ class SolarpumpBus(JNTFsmBus):
         except Exception:
             logger.exception("[%s] - Error in on_enter_sleeping", self.__class__.__name__)
         finally:
-            self.bus_release()
+            self.fsm_bus_release()
         self.start_check()
+        try:
+            self.publish_state()
+        except Exception:
+            logger.exception("[%s] - Error when publishing state", self.__class__.__name__)
 
     def on_enter_halted(self):
         """
         """
         logger.info("[%s] - on_enter_halted", self.__class__.__name__)
-        self.bus_acquire()
+        self.fsm_fsm_bus_acquire()
         try:
             self.stop_check()
             self.nodeman.remove_polls(self.running_sensors)
@@ -326,13 +322,17 @@ class SolarpumpBus(JNTFsmBus):
         except Exception:
             logger.exception("[%s] - Error in on_enter_halted", self.__class__.__name__)
         finally:
-            self.bus_release()
+            self.fsm_bus_release()
+        try:
+            self.publish_state()
+        except Exception:
+            logger.exception("[%s] - Error when publishing state", self.__class__.__name__)
 
     def on_enter_booting(self):
         """
         """
         logger.info("[%s] - on_enter_booting", self.__class__.__name__)
-        self.bus_acquire()
+        self.fsm_bus_acquire()
         try:
             self.stop_check()
             self.nodeman.remove_polls(self.running_sensors - self.sleeping_sensors)
@@ -342,13 +342,17 @@ class SolarpumpBus(JNTFsmBus):
         except Exception:
             logger.exception("[%s] - Error in on_enter_booting", self.__class__.__name__)
         finally:
-            self.bus_release()
+            self.fsm_bus_release()
+        try:
+            self.publish_state()
+        except Exception:
+            logger.exception("[%s] - Error when publishing state", self.__class__.__name__)
 
     def on_enter_charging(self):
         """
         """
         logger.info("[%s] - on_enter_charging", self.__class__.__name__)
-        self.bus_acquire()
+        self.fsm_bus_acquire()
         try:
             self.nodeman.add_polls(self.sleeping_sensors, slow_start=True, overwrite=False)
             self.nodeman.find_value('led', 'blink').data = 'off'
@@ -356,39 +360,51 @@ class SolarpumpBus(JNTFsmBus):
         except Exception:
             logger.exception("[%s] - Error in on_enter_charging", self.__class__.__name__)
         finally:
-            self.bus_release()
+            self.fsm_bus_release()
+        try:
+            self.publish_state()
+        except Exception:
+            logger.exception("[%s] - Error when publishing state", self.__class__.__name__)
 
     def on_enter_running(self):
         """
         """
         logger.info("[%s] - on_enter_running", self.__class__.__name__)
-        self.bus_acquire()
+        self.fsm_bus_acquire()
         try:
             self.nodeman.find_value('led', 'blink').data = 'heartbeat'
             self.nodeman.add_polls(self.running_sensors, slow_start=True, overwrite=False)
         except Exception:
             logger.exception("[%s] - Error in on_enter_running", self.__class__.__name__)
         finally:
-            self.bus_release()
+            self.fsm_bus_release()
+        try:
+            self.publish_state()
+        except Exception:
+            logger.exception("[%s] - Error when publishing state", self.__class__.__name__)
 
     def on_enter_freezing(self):
         """
         """
         logger.info("[%s] - on_enter_freezing", self.__class__.__name__)
-        self.bus_acquire()
+        self.fsm_bus_acquire()
         try:
             self.nodeman.find_value('led', 'blink').data = 'notify'
             self.get_bus_value('state').data = -1
         except Exception:
             logger.exception("[%s] - Error in on_enter_freezing", self.__class__.__name__)
         finally:
-            self.bus_release()
+            self.fsm_bus_release()
+        try:
+            self.publish_state()
+        except Exception:
+            logger.exception("[%s] - Error when publishing state", self.__class__.__name__)
 
     def on_enter_running_pumping(self):
         """ Start the pump system
         """
         logger.info("[%s] - on_enter_running_pumping", self.__class__.__name__)
-        self.bus_acquire()
+        self.fsm_bus_acquire()
         try:
             if self.thread_start_motor is not None:
                 self.thread_start_motor.cancel()
@@ -401,13 +417,17 @@ class SolarpumpBus(JNTFsmBus):
         except Exception:
             logger.exception("[%s] - Error in on_enter_running_pumping", self.__class__.__name__)
         finally:
-            self.bus_release()
+            self.fsm_bus_release()
+        try:
+            self.publish_state()
+        except Exception:
+            logger.exception("[%s] - Error when publishing state", self.__class__.__name__)
 
     def on_exit_running_pumping(self):
         """ Stop the pump system
         """
         logger.info("[%s] - on_exit_running_pumping", self.__class__.__name__)
-        self.bus_acquire()
+        self.fsm_bus_acquire()
         try:
             if self.thread_start_motor is not None:
                 self.thread_start_motor.cancel()
@@ -418,20 +438,24 @@ class SolarpumpBus(JNTFsmBus):
         except Exception:
             logger.exception("[%s] - Error in on_exit_running_pumping", self.__class__.__name__)
         finally:
-            self.bus_release()
+            self.fsm_bus_release()
 
     def on_enter_running_waiting(self):
         """ Start the pump system
         """
         logger.info("[%s] - on_enter_running_waiting", self.__class__.__name__)
-        self.bus_acquire()
+        self.fsm_bus_acquire()
         try:
             self.nodeman.find_value('led', 'blink').data = 'info'
             self.get_bus_value('state').data = 1
         except Exception:
             logger.exception("[%s] - Error in on_enter_running_waiting", self.__class__.__name__)
         finally:
-            self.bus_release()
+            self.fsm_bus_release()
+        try:
+            self.publish_state()
+        except Exception:
+            logger.exception("[%s] - Error when publishing state", self.__class__.__name__)
 
     def stop_check(self):
         """Check that the component is 'available'
