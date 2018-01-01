@@ -125,7 +125,7 @@ class SolarpumpBus(JNTFsmBus):
             'dest': 'sleeping',
             'conditions': 'condition_booting',
         },
-        { 'trigger': 'halt',
+        { 'trigger': 'stop',
             'source': '*',
             'dest': 'halted',
         },
@@ -588,7 +588,6 @@ class SolarpumpBus(JNTFsmBus):
         """Stop the bus
         """
         self.stop_check()
-        self.halt()
         for bus in self.buses:
             self.buses[bus].stop()
         JNTFsmBus.stop(self, **kwargs)
