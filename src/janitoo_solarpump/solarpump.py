@@ -321,22 +321,24 @@ class SolarpumpBus(JNTFsmBus):
         """
         """
         logger.info("[%s] - on_enter_halted", self.__class__.__name__)
+        self.stop_check()
         self.fsm_bus_acquire()
         try:
-            self.stop_check()
             self.nodeman.remove_polls(self.running_sensors)
             self.nodeman.find_value('led', 'blink').data = 'off'
         except Exception:
             logger.exception("[%s] - Error in on_enter_halted", self.__class__.__name__)
+        finally:
+            self.fsm_bus_release()
         JNTFsmBus.on_enter_halted(self)
 
     def on_enter_booting(self):
         """
         """
         logger.info("[%s] - on_enter_booting", self.__class__.__name__)
+        self.stop_check()
         self.fsm_bus_acquire()
         try:
-            self.stop_check()
             self.nodeman.remove_polls(self.running_sensors - self.sleeping_sensors)
             self.nodeman.add_polls(self.sleeping_sensors, slow_start=True, overwrite=False)
             self.nodeman.find_value('led', 'blink').data = 'off'
