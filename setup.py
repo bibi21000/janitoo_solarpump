@@ -101,6 +101,8 @@ setup(
                      'janitoo_raspberry_1wire',
                      'janitoo_datalog_rrd',
                      'python-rrdtool',
+                     'Adafruit-GPIO',
+                     'pi-ina219',
                       ],
     dependency_links = [
       'https://github.com/bibi21000/janitoo/archive/master.zip#egg=janitoo',
@@ -116,6 +118,8 @@ setup(
       'https://github.com/bibi21000/janitoo_hostsensor_psutil/archive/master.zip#egg=janitoo_hostsensor_psutil',
       'https://github.com/bibi21000/janitoo_raspberry_1wire/archive/master.zip#egg=janitoo_raspberry_1wire',
       'https://github.com/bibi21000/janitoo_datalog_rrd/archive/master.zip#egg=janitoo_datalog_rrd',
+      'https://github.com/bibi21000/pi_ina219/archive/master.zip#egg=pi-ina219',
+      'https://github.com/adafruit/Adafruit_Python_GPIO/archive/master.zip#egg=Adafruit-GPIO',
       'https://github.com/kyokenn/python-rrdtool/archive/master.zip#egg=python-rrdtool',
     ],
     entry_points = {
