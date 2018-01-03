@@ -39,7 +39,7 @@ from janitoo_raspberry_gpio.gpio import GpioBus, OutputComponent as GpioOut, Inp
 from janitoo_raspberry_i2c.bus_i2c import I2CBus
 from janitoo_raspberry_i2c_ds1307.ds1307 import DS1307Component
 from janitoo_raspberry_i2c_ads1x15.ads import ADSComponent as Ads1x15Component
-from janitoo_raspberry_i2c_ina219.ina219 import INA219Component as I2CINA219Component
+from janitoo_raspberry_i2c_ina219.ina import INA219Component as I2CINA219Component
 from janitoo_raspberry_1wire.bus_1wire import OnewireBus
 from janitoo_raspberry_1wire.components import DS18B20
 from janitoo_hostsensor_raspberry.component import HardwareCpu
