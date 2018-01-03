@@ -39,6 +39,7 @@ from janitoo_raspberry_gpio.gpio import GpioBus, OutputComponent as GpioOut, Inp
 from janitoo_raspberry_i2c.bus_i2c import I2CBus
 from janitoo_raspberry_i2c_ds1307.ds1307 import DS1307Component
 from janitoo_raspberry_i2c_ads1x15.ads import ADSComponent as Ads1x15Component
+from janitoo_raspberry_i2c_ina219.ina219 import INA219Component as I2CINA219Component
 from janitoo_raspberry_1wire.bus_1wire import OnewireBus
 from janitoo_raspberry_1wire.components import DS18B20
 from janitoo_hostsensor_raspberry.component import HardwareCpu
@@ -82,6 +83,9 @@ def make_input(**kwargs):
 
 def make_led(**kwargs):
     return LedComponent(**kwargs)
+
+def make_ina219(**kwargs):
+    return INA219Component(**kwargs)
 
 def make_http_resource(**kwargs):
     return HttpResourceComponent(**kwargs)
@@ -665,6 +669,18 @@ class ClockComponent(DS1307Component):
                 **kwargs)
         logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
 
+class INA219Component(I2CINA219Component):
+    """ A component """
+
+    def __init__(self, bus=None, addr=None, **kwargs):
+        """
+        """
+        oid = kwargs.pop('oid', '%s.ina219'%OID)
+        name = kwargs.pop('name', "INA219")
+        I2CINA219Component.__init__(self, oid=oid, bus=bus, addr=addr, name=name,
+                **kwargs)
+        logger.debug("[%s] - __init__ node uuid:%s", self.__class__.__name__, self.uuid)
+ 
 class AdsComponent(Ads1x15Component):
     """ An analogic to numeric converter component """
 
