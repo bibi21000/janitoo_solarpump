@@ -2,6 +2,6 @@
 #
 
 NOSEMODULES  = janitoo,janitoo_factory,janitoo_factory_exts,janitoo_raspberry,janitoo_hostsensor,janitoo_hostsensor_raspberry,janitoo_hostsensor_psutil,janitoo_datalog_rrd
-MOREMODULES  = janitoo_raspberry_gpio,janitoo_raspberry_dht,janitoo_raspberry_i2c,janitoo_raspberry_i2c_ds1307,janitoo_raspberry_i2c_ads1x15,janitoo_raspberry_1wire
+MOREMODULES  = janitoo_raspberry_gpio,janitoo_raspberry_dht,janitoo_raspberry_i2c,janitoo_raspberry_i2c_ds1307,janitoo_raspberry_i2c_ina219,janitoo_raspberry_i2c_ads1x15,janitoo_raspberry_1wire
 
 NOSECOVER     = --cover-package=${NOSEMODULES},${MODULENAME},${MOREMODULES} --with-coverage --cover-inclusive --with-xunit --xunit-testsuite-name=${MODULENAME}
