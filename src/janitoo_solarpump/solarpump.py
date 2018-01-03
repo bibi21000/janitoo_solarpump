@@ -246,6 +246,7 @@ class SolarpumpBus(JNTFsmBus):
             self.nodeman.find_value('led', 'state'),
             self.nodeman.find_value('ambiancein', 'temperature'),
             self.nodeman.find_value('ambianceout', 'temperature'),
+            self.nodeman.find_value('ina219', 'power'),
         ]))
 
     @property
