@@ -19,6 +19,7 @@ Contents
 
     Installation <INSTALL>
     State machine <state_machine>
+    Examples of configuration files <configuration_files>
     Using documentation <using_doc>
 
 Indices and tables

@@ -5,7 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>janitoo_solarpump.solarpump &#8212; janitoo_solarpump 0.0.8 documentation</title>
+    <title>janitoo_solarpump.solarpump &#8212; janitoo_solarpump 0.0.9 documentation</title>
     
     <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.8',
+        VERSION:     '0.0.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -52,7 +52,7 @@
         </button>
         <a class="navbar-brand" href="../../index.html">
           janitoo_solarpump</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0.8</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>0.0.9</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -72,6 +72,7 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../state_machine.html">State machine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration_files.html">Examples of configuration files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../using_doc.html">Using documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../using_doc.html#the-header">The header</a></li>
 </ul>
@@ -138,28 +139,23 @@
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">threading</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
 
-<span class="kn">from</span> <span class="nn">janitoo.fsm</span> <span class="k">import</span> <span class="n">HierarchicalMachine</span> <span class="k">as</span> <span class="n">Machine</span>
-<span class="kn">from</span> <span class="nn">janitoo.thread</span> <span class="k">import</span> <span class="n">JNTBusThread</span><span class="p">,</span> <span class="n">BaseThread</span>
-<span class="kn">from</span> <span class="nn">janitoo.options</span> <span class="k">import</span> <span class="n">get_option_autostart</span>
-<span class="kn">from</span> <span class="nn">janitoo.utils</span> <span class="k">import</span> <span class="n">HADD</span>
-<span class="kn">from</span> <span class="nn">janitoo.node</span> <span class="k">import</span> <span class="n">JNTNode</span>
-<span class="kn">from</span> <span class="nn">janitoo.value</span> <span class="k">import</span> <span class="n">JNTValue</span>
-<span class="kn">from</span> <span class="nn">janitoo.component</span> <span class="k">import</span> <span class="n">JNTComponent</span>
+<span class="kn">from</span> <span class="nn">janitoo.thread</span> <span class="k">import</span> <span class="n">JNTBusThread</span>
 
 <span class="kn">from</span> <span class="nn">janitoo_factory.buses.fsm</span> <span class="k">import</span> <span class="n">JNTFsmBus</span>
+<span class="kn">from</span> <span class="nn">janitoo_factory.threads.http</span> <span class="k">import</span> <span class="n">BasicResourceComponent</span>
 
 <span class="kn">from</span> <span class="nn">janitoo_raspberry_dht.dht</span> <span class="k">import</span> <span class="n">DHTComponent</span>
 <span class="kn">from</span> <span class="nn">janitoo_raspberry_gpio.gpio</span> <span class="k">import</span> <span class="n">GpioBus</span><span class="p">,</span> <span class="n">OutputComponent</span> <span class="k">as</span> <span class="n">GpioOut</span><span class="p">,</span> <span class="n">InputComponent</span> <span class="k">as</span> <span class="n">GpioIn</span>
 <span class="kn">from</span> <span class="nn">janitoo_raspberry_i2c.bus_i2c</span> <span class="k">import</span> <span class="n">I2CBus</span>
 <span class="kn">from</span> <span class="nn">janitoo_raspberry_i2c_ds1307.ds1307</span> <span class="k">import</span> <span class="n">DS1307Component</span>
 <span class="kn">from</span> <span class="nn">janitoo_raspberry_i2c_ads1x15.ads</span> <span class="k">import</span> <span class="n">ADSComponent</span> <span class="k">as</span> <span class="n">Ads1x15Component</span>
-<span class="kn">from</span> <span class="nn">janitoo_hostsensor_raspberry.component</span> <span class="k">import</span> <span class="n">HardwareCpu</span>
+<span class="kn">from</span> <span class="nn">janitoo_raspberry_i2c_ina219.ina</span> <span class="k">import</span> <span class="n">INA219Component</span> <span class="k">as</span> <span class="n">I2CINA219Component</span>
 <span class="kn">from</span> <span class="nn">janitoo_raspberry_1wire.bus_1wire</span> <span class="k">import</span> <span class="n">OnewireBus</span>
 <span class="kn">from</span> <span class="nn">janitoo_raspberry_1wire.components</span> <span class="k">import</span> <span class="n">DS18B20</span>
+<span class="kn">from</span> <span class="nn">janitoo_hostsensor_raspberry.component</span> <span class="k">import</span> <span class="n">HardwareCpu</span>
 
 <span class="c1">##############################################################</span>
 <span class="c1">#Check that we are in sync with the official command classes</span>
@@ -201,6 +197,12 @@
 <div class="viewcode-block" id="make_led"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.make_led">[docs]</a><span class="k">def</span> <span class="nf">make_led</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">LedComponent</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="make_ina219"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.make_ina219">[docs]</a><span class="k">def</span> <span class="nf">make_ina219</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">INA219Component</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="make_http_resource"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.make_http_resource">[docs]</a><span class="k">def</span> <span class="nf">make_http_resource</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">HttpResourceComponent</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
 <span class="c1">#~ def make_pump(**kwargs):</span>
     <span class="c1">#~ return PumpComponent(**kwargs)</span>
 
@@ -217,6 +219,7 @@
 
     <span class="n">states</span> <span class="o">=</span> <span class="p">[</span>
        <span class="s1">&#39;booting&#39;</span><span class="p">,</span>
+       <span class="s1">&#39;halted&#39;</span><span class="p">,</span>
        <span class="s1">&#39;sleeping&#39;</span><span class="p">,</span>
        <span class="s1">&#39;charging&#39;</span><span class="p">,</span>
        <span class="s1">&#39;freezing&#39;</span><span class="p">,</span>
@@ -239,6 +242,10 @@
             <span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="s1">&#39;sleeping&#39;</span><span class="p">,</span>
             <span class="s1">&#39;conditions&#39;</span><span class="p">:</span> <span class="s1">&#39;condition_booting&#39;</span><span class="p">,</span>
         <span class="p">},</span>
+        <span class="p">{</span> <span class="s1">&#39;trigger&#39;</span><span class="p">:</span> <span class="s1">&#39;halted&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="s1">&#39;halted&#39;</span><span class="p">,</span>
+        <span class="p">},</span>
         <span class="p">{</span> <span class="s1">&#39;trigger&#39;</span><span class="p">:</span> <span class="s1">&#39;sleep&#39;</span><span class="p">,</span>
             <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
             <span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="s1">&#39;sleeping&#39;</span><span class="p">,</span>
@@ -255,7 +262,7 @@
             <span class="s1">&#39;conditions&#39;</span><span class="p">:</span> <span class="s1">&#39;condition_sleeping&#39;</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="p">{</span> <span class="s1">&#39;trigger&#39;</span><span class="p">:</span> <span class="s1">&#39;pump&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;running&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;running&#39;</span><span class="p">,</span><span class="s1">&#39;charging&#39;</span><span class="p">],</span>
             <span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="s1">&#39;running_pumping&#39;</span><span class="p">,</span>
             <span class="s1">&#39;conditions&#39;</span><span class="p">:</span> <span class="s1">&#39;condition_running&#39;</span><span class="p">,</span>
         <span class="p">},</span>
@@ -265,7 +272,7 @@
             <span class="s1">&#39;conditions&#39;</span><span class="p">:</span> <span class="s1">&#39;condition_running&#39;</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="p">{</span> <span class="s1">&#39;trigger&#39;</span><span class="p">:</span> <span class="s1">&#39;wait&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="s1">&#39;running&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;running&#39;</span><span class="p">,</span><span class="s1">&#39;charging&#39;</span><span class="p">],</span>
             <span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="s1">&#39;running_waiting&#39;</span><span class="p">,</span>
             <span class="s1">&#39;conditions&#39;</span><span class="p">:</span> <span class="s1">&#39;condition_running&#39;</span><span class="p">,</span>
         <span class="p">},</span>
@@ -280,19 +287,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">buses</span><span class="p">[</span><span class="s1">&#39;1wire&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OnewireBus</span><span class="p">(</span><span class="n">masters</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">buses</span><span class="p">[</span><span class="s1">&#39;i2c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">I2CBus</span><span class="p">(</span><span class="n">masters</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_timer</span> <span class="o">=</span> <span class="kc">None</span>
+ 
+        <span class="n">timer_delay</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;timer_delay&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
         <span class="n">uuid</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2">_timer_delay&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">OID</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_factory</span><span class="p">[</span><span class="s1">&#39;config_integer&#39;</span><span class="p">](</span><span class="n">options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">,</span>
             <span class="n">node_uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
             <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The delay between 2 checks&#39;</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Timer.&#39;</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="n">timer_delay</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">uuid</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2">_temperature_freeze&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">OID</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_factory</span><span class="p">[</span><span class="s1">&#39;config_float&#39;</span><span class="p">](</span><span class="n">options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">,</span>
             <span class="n">node_uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
             <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The feezing temperature.&#39;</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Temp Freeze&#39;</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">uuid</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2">_temperature_min&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">OID</span><span class="p">)</span>
@@ -300,34 +309,45 @@
             <span class="n">node_uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
             <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The minimum temperature to restart pumping.&#39;</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Temp Min&#39;</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">uuid</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2">_temperature_fan&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">OID</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_factory</span><span class="p">[</span><span class="s1">&#39;config_float&#39;</span><span class="p">](</span><span class="n">options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">,</span>
+            <span class="n">node_uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The minimum temperature to start fans.&#39;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Temp fan&#39;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">uuid</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2">_battery_critical&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">OID</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_factory</span><span class="p">[</span><span class="s1">&#39;config_float&#39;</span><span class="p">](</span><span class="n">options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">,</span>
             <span class="n">node_uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
             <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The critical level for battery.&#39;</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;batt crit&#39;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Batt crit&#39;</span><span class="p">,</span>
             <span class="n">default</span><span class="o">=</span><span class="mf">11.6</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;V&#39;</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="n">uuid</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2">_battery_min&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">OID</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_factory</span><span class="p">[</span><span class="s1">&#39;config_float&#39;</span><span class="p">](</span><span class="n">options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">,</span>
             <span class="n">node_uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
             <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The minimal level for battery.&#39;</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;batt crit&#39;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;batt min&#39;</span><span class="p">,</span>
             <span class="n">default</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span>
+            <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;V&#39;</span><span class="p">,</span>
         <span class="p">)</span>
-
-        <span class="n">uuid</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2">_state&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">OID</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_factory</span><span class="p">[</span><span class="s1">&#39;sensor_integer&#39;</span><span class="p">](</span><span class="n">options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">,</span>
+        <span class="n">pump_delay</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;timer_delay&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">uuid</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{:s}</span><span class="s2">_pump_delay&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">OID</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">uuid</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_factory</span><span class="p">[</span><span class="s1">&#39;config_integer&#39;</span><span class="p">](</span><span class="n">options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">,</span>
             <span class="n">node_uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The state of the system : -3 booting -2 sleeping, -1 charging, 0 freezing, 1 waiting, 2 pumping.&#39;</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;state&#39;</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=-</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The delay between inverter and pump&#39;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Delay&#39;</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="n">pump_delay</span><span class="p">,</span>
         <span class="p">)</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread_fan</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sleeping_sensors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -339,19 +359,24 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;led&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;ambiancein&#39;</span><span class="p">,</span> <span class="s1">&#39;temperature&#39;</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;ambianceout&#39;</span><span class="p">,</span> <span class="s1">&#39;temperature&#39;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;ina219&#39;</span><span class="p">,</span> <span class="s1">&#39;power&#39;</span><span class="p">),</span>
         <span class="p">]))</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">running_sensors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;The sensors we will poll</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">water_sensors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">opt_sensors</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;level1&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">water_sensors</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">opt_sensors</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;level1&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;level2&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">),</span>
             <span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeping_sensors</span><span class="o">.</span><span class="n">union</span><span class="p">(</span> <span class="nb">set</span><span class="p">(</span> <span class="n">water_sensors</span> <span class="o">+</span> <span class="p">[</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;fan&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">opt_sensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;fan&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;fan_battery&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">opt_sensors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;fan_battery&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeping_sensors</span><span class="o">.</span><span class="n">union</span><span class="p">(</span> <span class="nb">set</span><span class="p">(</span> <span class="n">opt_sensors</span> <span class="o">+</span> <span class="p">[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;ambiancein&#39;</span><span class="p">,</span> <span class="s1">&#39;humidity&#39;</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;ambianceout&#39;</span><span class="p">,</span> <span class="s1">&#39;humidity&#39;</span><span class="p">),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">,</span> <span class="s1">&#39;temperature&#39;</span><span class="p">),</span>
@@ -395,127 +420,160 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - on_enter_sleeping&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bus_acquire</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_acquire</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stop_check</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">remove_polls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">running_sensors</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeping_sensors</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">add_polls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeping_sensors</span><span class="p">,</span> <span class="n">slow_start</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;led&#39;</span><span class="p">,</span> <span class="s1">&#39;blink&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;off&#39;</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_enter_sleeping&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bus_release</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_release</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_check</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">publish_state</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error when publishing state&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SolarpumpBus.on_enter_halted"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_halted">[docs]</a>    <span class="k">def</span> <span class="nf">on_enter_halted</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - on_enter_halted&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_check</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_acquire</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">remove_polls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">running_sensors</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;led&#39;</span><span class="p">,</span> <span class="s1">&#39;blink&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;off&#39;</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_enter_halted&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_release</span><span class="p">()</span>
+        <span class="n">JNTFsmBus</span><span class="o">.</span><span class="n">on_enter_halted</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SolarpumpBus.on_enter_booting"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_booting">[docs]</a>    <span class="k">def</span> <span class="nf">on_enter_booting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - on_enter_booting&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bus_acquire</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_check</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_acquire</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">stop_check</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">remove_polls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">running_sensors</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeping_sensors</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">add_polls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeping_sensors</span><span class="p">,</span> <span class="n">slow_start</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;led&#39;</span><span class="p">,</span> <span class="s1">&#39;blink&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;off&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;state&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_enter_booting&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bus_release</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_release</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">publish_state</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error when publishing state&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SolarpumpBus.on_enter_charging"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_charging">[docs]</a>    <span class="k">def</span> <span class="nf">on_enter_charging</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - on_enter_charging&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bus_acquire</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_acquire</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">add_polls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeping_sensors</span><span class="p">,</span> <span class="n">slow_start</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;led&#39;</span><span class="p">,</span> <span class="s1">&#39;blink&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;off&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;state&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_enter_charging&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bus_release</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_release</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_timer</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_started</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">check_timer</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;timer_delay&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_check</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">check_timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">publish_state</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_enter_charging&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error when publishing state&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SolarpumpBus.on_enter_running"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_running">[docs]</a>    <span class="k">def</span> <span class="nf">on_enter_running</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - on_enter_running&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bus_acquire</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_acquire</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;led&#39;</span><span class="p">,</span> <span class="s1">&#39;blink&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;heartbeat&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">add_polls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">running_sensors</span><span class="p">,</span> <span class="n">slow_start</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_enter_running&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bus_release</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_release</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">publish_state</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error when publishing state&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SolarpumpBus.on_enter_freezing"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_freezing">[docs]</a>    <span class="k">def</span> <span class="nf">on_enter_freezing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - on_enter_freezing&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bus_acquire</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_acquire</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;led&#39;</span><span class="p">,</span> <span class="s1">&#39;blink&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;notify&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;state&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_enter_freezing&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bus_release</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_release</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">publish_state</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error when publishing state&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SolarpumpBus.on_enter_running_pumping"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_running_pumping">[docs]</a>    <span class="k">def</span> <span class="nf">on_enter_running_pumping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Start the pump system</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - on_enter_running_pumping&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bus_acquire</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_acquire</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;led&#39;</span><span class="p">,</span> <span class="s1">&#39;blink&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;info1&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">start_inverter</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_pump</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;pump_delay&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_pump</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;state&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_enter_running_pumping&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bus_release</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_release</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">publish_state</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error when publishing state&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SolarpumpBus.on_exit_running_pumping"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_exit_running_pumping">[docs]</a>    <span class="k">def</span> <span class="nf">on_exit_running_pumping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Stop the pump system</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - on_exit_running_pumping&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bus_acquire</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_acquire</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stop_pump</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_inverter</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;pump_delay&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_inverter</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_exit_running_pumping&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bus_release</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_release</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SolarpumpBus.on_enter_running_waiting"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_running_waiting">[docs]</a>    <span class="k">def</span> <span class="nf">on_enter_running_waiting</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Start the pump system</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - on_enter_running_waiting&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bus_acquire</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_acquire</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;led&#39;</span><span class="p">,</span> <span class="s1">&#39;blink&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;info&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;state&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_enter_running_waiting&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">bus_release</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fsm_bus_release</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">publish_state</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error when publishing state&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SolarpumpBus.stop_check"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.stop_check">[docs]</a>    <span class="k">def</span> <span class="nf">stop_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check that the component is &#39;available&#39;</span>
@@ -525,35 +583,64 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">check_timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">check_timer</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="SolarpumpBus.check_tempetatures"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.check_tempetatures">[docs]</a>    <span class="k">def</span> <span class="nf">check_tempetatures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SolarpumpBus.start_check"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.start_check">[docs]</a>    <span class="k">def</span> <span class="nf">start_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check that the component is &#39;available&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_timer</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_started</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;timer_delay&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_timer</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;timer_delay&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_check</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SolarpumpBus.check_temperatures"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.check_temperatures">[docs]</a>    <span class="k">def</span> <span class="nf">check_temperatures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Make a check using a timer.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#Check the temperatures</span>
-        <span class="n">freeze_temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;temperature_freeze&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
-        <span class="n">min_temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;temperature_min&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
-        <span class="n">temp1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;temperature&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
-        <span class="n">temp2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;ambianceout&#39;</span><span class="p">,</span> <span class="s1">&#39;temperature&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">fan_temp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fan_temp&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fan_temp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fan_temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;temperature_fan&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">min_temp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;min_temp&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">freeze_temp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;freeze_temp&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">freeze_temp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">freeze_temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;temperature_freeze&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">min_temp</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;min_temp&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">min_temp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">min_temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;temperature_min&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">temp1</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;temp1&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">temp1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">temp1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;temperature&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">temp2</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;temp2&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">temp2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">temp2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;ambianceout&#39;</span><span class="p">,</span> <span class="s1">&#39;temperature&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">temp_battery</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;temp_battery&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">temp_battery</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">temp_battery</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;temp_battery&#39;</span><span class="p">,</span> <span class="s1">&#39;temperature&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+
         <span class="k">if</span> <span class="n">temp1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">temp1</span> <span class="o">=</span> <span class="n">temp2</span>
         <span class="k">if</span> <span class="n">temp2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_check : can&#39;t find temeprature sensors&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">temp</span> <span class="o">=</span> <span class="p">(</span> <span class="n">temp1</span> <span class="o">+</span> <span class="n">temp2</span> <span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
-            <span class="k">if</span> <span class="n">temp</span> <span class="o">&lt;</span> <span class="n">freeze_temp</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">temp</span> <span class="o">&lt;</span> <span class="n">freeze_temp</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="s1">&#39;sleeping&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">freeze</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">temp</span> <span class="o">&gt;</span> <span class="n">min_temp</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;freezing&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">()</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="SolarpumpBus.check_levels"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.check_levels">[docs]</a>    <span class="k">def</span> <span class="nf">check_levels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SolarpumpBus.check_levels"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.check_levels">[docs]</a>    <span class="k">def</span> <span class="nf">check_levels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Make a check using a timer.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;level1&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">level1</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level1&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">level1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">level1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;level1&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
-            <span class="n">level2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;level2&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">if</span> <span class="n">level1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">level2</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level2&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">level2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">level2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;level2&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
             <span class="k">if</span> <span class="n">level1</span><span class="o">==</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">level2</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_check : icompatibles values in water levels&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_check : incompatibles values in water levels&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">level1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
@@ -562,40 +649,56 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">pump</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="SolarpumpBus.check_battery"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.check_battery">[docs]</a>    <span class="k">def</span> <span class="nf">check_battery</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SolarpumpBus.check_battery"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.check_battery">[docs]</a>    <span class="k">def</span> <span class="nf">check_battery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Make a check using a timer.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#Check the temperatures</span>
-        <span class="n">battery_critical</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;battery_critical&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
-        <span class="n">battery_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;battery_min&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
-        <span class="n">battery</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;battery&#39;</span><span class="p">,</span> <span class="s1">&#39;voltage&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
-        <span class="n">solar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;solar&#39;</span><span class="p">,</span> <span class="s1">&#39;voltage&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
-        <span class="k">if</span> <span class="n">battery</span> <span class="o">&lt;</span> <span class="n">battery_critical</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="s1">&#39;sleeping&#39;</span><span class="p">:</span>
+        <span class="n">battery_critical</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;battery_critical&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">battery_critical</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">battery_critical</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;battery_critical&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">battery_min</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;battery_min&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">battery_min</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">battery_min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;battery_min&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">battery</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;battery&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">battery</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">battery</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeman</span><span class="o">.</span><span class="n">find_value</span><span class="p">(</span><span class="s1">&#39;battery&#39;</span><span class="p">,</span> <span class="s1">&#39;voltage&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+            
+        <span class="k">if</span> <span class="n">battery</span> <span class="o">&lt;</span> <span class="n">battery_critical</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">battery</span> <span class="o">&gt;</span> <span class="n">battery_min</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;sleeping&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
+        <span class="k">elif</span> <span class="n">battery</span> <span class="o">&lt;</span> <span class="n">battery_min</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">battery</span> <span class="o">&gt;</span> <span class="n">battery_min</span> <span class="o">+</span> <span class="mf">0.2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;sleeping&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;charging&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="SolarpumpBus.on_check"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_check">[docs]</a>    <span class="k">def</span> <span class="nf">on_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SolarpumpBus.on_check"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_check">[docs]</a>    <span class="k">def</span> <span class="nf">on_check</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Make a check using a timer.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fire_again</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">delay_mult</span> <span class="o">=</span> <span class="mi">1</span>
+        
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stop_check</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">check_battery</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_battery</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="s1">&#39;sleeping&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">check_tempetatures</span><span class="p">()</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;charging&#39;</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">check_levels</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">check_temperatures</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;running&#39;</span><span class="p">,</span> <span class="s1">&#39;running_pumping&#39;</span><span class="p">,</span> <span class="s1">&#39;running_waiting&#39;</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">check_levels</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">fire_again</span> <span class="o">=</span> <span class="kc">False</span>
-
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s1">&#39;sleeping&#39;</span><span class="p">:</span>
+                <span class="n">delay_mult</span> <span class="o">=</span> <span class="mi">3</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - Error in on_check&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">fire_again</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_timer</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_started</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">check_timer</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;timer_delay&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_check</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">check_timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+        <span class="n">fire_again</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;fire_again&#39;</span><span class="p">,</span> <span class="n">fire_again</span><span class="p">)</span>
+        <span class="n">timer_delay</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;timer_delay&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_bus_value</span><span class="p">(</span><span class="s1">&#39;timer_delay&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fire_again</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start_check</span><span class="p">()</span></div>
             
 <div class="viewcode-block" id="SolarpumpBus.start_pump"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.start_pump">[docs]</a>    <span class="k">def</span> <span class="nf">start_pump</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Start the pump</span>
@@ -605,8 +708,7 @@
 <div class="viewcode-block" id="SolarpumpBus.stop_pump"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.stop_pump">[docs]</a>    <span class="k">def</span> <span class="nf">stop_pump</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Stop the pump</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">pass</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="o">=</span> <span class="kc">None</span></div>
         
 <div class="viewcode-block" id="SolarpumpBus.start_inverter"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.start_inverter">[docs]</a>    <span class="k">def</span> <span class="nf">start_inverter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Start the inverter</span>
@@ -616,23 +718,26 @@
 <div class="viewcode-block" id="SolarpumpBus.stop_inverter"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.stop_inverter">[docs]</a>    <span class="k">def</span> <span class="nf">stop_inverter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Stop the pump</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">pass</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="o">=</span> <span class="kc">None</span></div>
         
-<div class="viewcode-block" id="SolarpumpBus.start"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mqttc</span><span class="p">,</span> <span class="n">trigger_thread_reload_cb</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SolarpumpBus.start"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mqttc</span><span class="p">,</span> <span class="n">trigger_thread_reload_cb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Start the bus</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">bus</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">buses</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">buses</span><span class="p">[</span><span class="n">bus</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">mqttc</span><span class="p">,</span> <span class="n">trigger_thread_reload_cb</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-        <span class="n">JNTFsmBus</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mqttc</span><span class="p">,</span> <span class="n">trigger_thread_reload_cb</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">buses</span><span class="p">[</span><span class="n">bus</span><span class="p">]</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">mqttc</span><span class="p">,</span> <span class="n">trigger_thread_reload_cb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">JNTFsmBus</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mqttc</span><span class="p">,</span> <span class="n">trigger_thread_reload_cb</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SolarpumpBus.stop"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SolarpumpBus.stop"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Stop the bus</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">stop_check</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">bus</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">buses</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">buses</span><span class="p">[</span><span class="n">bus</span><span class="p">]</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-        <span class="n">JNTFsmBus</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;halt&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">halt</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thread_start_motor</span> <span class="o">=</span> <span class="kc">None</span>
+         
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_buses</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">buses</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">JNTFsmBus</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SolarpumpBus.loop"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.loop">[docs]</a>    <span class="k">def</span> <span class="nf">loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stopevent</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve data</span>
@@ -678,6 +783,18 @@
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - __init__ node uuid:</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="INA219Component"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.INA219Component">[docs]</a><span class="k">class</span> <span class="nc">INA219Component</span><span class="p">(</span><span class="n">I2CINA219Component</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A component &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">addr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">oid</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;oid&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.ina219&#39;</span><span class="o">%</span><span class="n">OID</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s2">&quot;INA219&quot;</span><span class="p">)</span>
+        <span class="n">I2CINA219Component</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oid</span><span class="o">=</span><span class="n">oid</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">,</span> <span class="n">addr</span><span class="o">=</span><span class="n">addr</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - __init__ node uuid:</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span></div>
+ 
 <div class="viewcode-block" id="AdsComponent"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.AdsComponent">[docs]</a><span class="k">class</span> <span class="nc">AdsComponent</span><span class="p">(</span><span class="n">Ads1x15Component</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; An analogic to numeric converter component &quot;&quot;&quot;</span>
 
@@ -767,7 +884,7 @@
             <span class="n">node_uuid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
             <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The led to report state of the system.&#39;</span><span class="p">,</span>
             <span class="n">label</span><span class="o">=</span><span class="s1">&#39;LED&#39;</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">default</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span>
             <span class="n">blink_off_cb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blink_off</span><span class="p">,</span>
             <span class="n">blink_on_cb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blink_off</span><span class="p">,</span>
         <span class="p">)</span>
@@ -782,6 +899,31 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">node_uuid</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="HttpResourceComponent"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.HttpResourceComponent">[docs]</a><span class="k">class</span> <span class="nc">HttpResourceComponent</span><span class="p">(</span><span class="n">BasicResourceComponent</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A resource ie /rrd &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bus</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">addr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">product_name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;product_name&#39;</span><span class="p">,</span> <span class="s2">&quot;HTTP solarpump resource&quot;</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s2">&quot;Http solarpump resource&quot;</span><span class="p">)</span>
+        <span class="n">BasicResourceComponent</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;solarpump&#39;</span><span class="p">,</span> <span class="n">oid</span><span class="o">=</span><span class="s1">&#39;http.solarpump&#39;</span><span class="p">,</span> 
+            <span class="n">bus</span><span class="o">=</span><span class="n">bus</span><span class="p">,</span> <span class="n">addr</span><span class="o">=</span><span class="n">addr</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">product_name</span><span class="o">=</span><span class="n">product_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] - __init__ node uuid:</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+
+<div class="viewcode-block" id="HttpResourceComponent.get_package_name"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.HttpResourceComponent.get_package_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_package_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the name of the package. Needed to publish static files</span>
+
+<span class="sd">        **MUST** be copy paste in every extension that publish statics files</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">__package__</span></div>
+
+<div class="viewcode-block" id="HttpResourceComponent.check_heartbeat"><a class="viewcode-back" href="../../api/index.html#janitoo_solarpump.solarpump.HttpResourceComponent.check_heartbeat">[docs]</a>    <span class="k">def</span> <span class="nf">check_heartbeat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check that the component is &#39;available&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_heartbeat_file</span><span class="p">(</span><span class="s1">&#39;solarpump&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
     </div>
