@@ -12,6 +12,8 @@ general:
 
 dependencies:
   pre:
+    - sudo apt-get update -qq
     - make directories
     - make deps
     - make travis-deps
+    - make install
