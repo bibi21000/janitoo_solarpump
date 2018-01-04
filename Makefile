@@ -25,6 +25,7 @@ ifneq ('${BASHDEPS}','')
 	bash ${BASHDEPS}
 endif
 ifneq ('${DEBIANDEPS}','')
+	sudo apt-get update
 	sudo apt-get install -y ${DEBIANDEPS}
 endif
 	@echo
