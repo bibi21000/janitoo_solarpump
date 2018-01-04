@@ -87,7 +87,7 @@ class TestSolarpumpServer(JNTTServer, JNTTServerCommon):
         bus.sleep()
         time.sleep(2)
         bus.charge()
-        time.sleep(2)
+        time.sleep(3)
         bus.run()
         time.sleep(2)
         bus.pump()
