@@ -77,14 +77,22 @@ class TestSolarpumpThread(JNTTThreadRun, JNTTThreadRunCommon):
         time.sleep(5)
         self.assertValueOnBus('cpu','temperature')
         self.assertValueOnBus('temperature','temperature')
+        self.assertValueOnBus('temp_battery','temperature')
         self.assertValueOnBus('ambiancein','temperature')
         self.assertValueOnBus('ambiancein','humidity')
         self.assertValueOnBus('ambianceout','temperature')
         self.assertValueOnBus('ambianceout','humidity')
+        self.assertValueOnBus('solar','voltage')
+        self.assertValueOnBus('battery','voltage')
         self.assertValueOnBus('inverter','state')
         self.assertValueOnBus('pump','state')
         self.assertValueOnBus('led','blink')
-        self.assertValueOnBus('led','blink')
+        self.assertValueOnBus('led_error','blink')
+        self.assertValueOnBus('level1','state')
+        self.assertValueOnBus('level2','state')
+        self.assertValueOnBus('fan','state')
+        self.assertValueOnBus('fan_battery','state')
+        self.assertValueOnBus('ina219','power')
 
     def test_103_state_machine(self):
         self.wait_for_nodeman()
@@ -154,7 +162,7 @@ class TestSolarpumpThread(JNTTThreadRun, JNTTThreadRunCommon):
         print(allargs)
         self.thread.bus.on_check(**allargs)
         time.sleep(1)
-        self.assertEqual( 'freezing', self.thread.bus.state)
+        self.assertEqual( 'running_freezing', self.thread.bus.state)
         #Temp is high, we must wait for the sun
         allargs['temp1'] = 14
         allargs['temp2'] = 11

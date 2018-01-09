@@ -99,80 +99,64 @@ def make_http_resource(**kwargs):
 #~ def make_proximity(**kwargs):
     #~ return ProximityComponent(**kwargs)
 
-
-class SolarpumpBus(JNTFsmBus):
-    """A bus to manage Solarpump
+class BatteryPoweredBus(JNTFsmBus):
+    """A bus to manage Solar/Wind powered systems. It use a state machine to manage : boot, charge, sleep and running states.
     """
-
-    states = [
-       'booting',
-       'halted',
-       'sleeping',
-       'charging',
-       'freezing',
-       { 'name': 'running',
-         'children': ['pumping', 'waiting'],
-       },
-    ]
-    """The solarpump states :
-        - sleeping : the power is very low, we do not poll sensors again (except the battery ones, 
-        - charging : power is low. We can poll sensors again.
-        - running : power is ok. We may pump
-            - pumping : the pump is on !!!
-            - freezing : stop pumping !!!
-            - waiting : waiting for water
-    """
-
-    transitions = [
-        { 'trigger': 'boot',
-            'source': 'booting',
-            'dest': 'sleeping',
-            'conditions': 'condition_booting',
-        },
-        { 'trigger': 'halted',
-            'source': '*',
-            'dest': 'halted',
-        },
-        { 'trigger': 'sleep',
-            'source': '*',
-            'dest': 'sleeping',
-            'conditions': 'condition_sleeping',
-        },
-        { 'trigger': 'charge',
-            'source': '*',
-            'dest': 'charging',
-            'conditions': 'condition_running',
-        },
-        { 'trigger': 'freeze',
-            'source': '*',
-            'dest': 'freezing',
-            'conditions': 'condition_sleeping',
-        },
-        { 'trigger': 'pump',
-            'source': ['running','charging'],
-            'dest': 'running_pumping',
-            'conditions': 'condition_running',
-        },
-        { 'trigger': 'run',
-            'source': 'charging',
-            'dest': 'running',
-            'conditions': 'condition_running',
-        },
-        { 'trigger': 'wait',
-            'source': ['running','charging'],
-            'dest': 'running_waiting',
-            'conditions': 'condition_running',
-        },
-    ]
 
     def __init__(self, **kwargs):
         """
         """
         JNTFsmBus.__init__(self, **kwargs)
+        self.states = [
+           'booting',
+           'halted',
+           'sleeping',
+           'charging',
+           'running',
+        ]
+        """The solarpump states :
+            - booting : the system starts. 
+            - halted : the system is halted. 
+            - sleeping : the power is very low, we do not poll sensors again (except the battery ones). 
+            - charging : power is low. We can poll sensors again.
+            - running : power is ok. We may run
+        """
+
+        self.transitions = [
+            { 'trigger': 'boot',
+                'source': ['booting','halted'],
+                'dest': 'sleeping',
+                'conditions': 'condition_booting',
+                'after': 'publish_state',
+            },
+            { 'trigger': 'halt',
+                'source': '*',
+                'dest': 'halted',
+            },
+            { 'trigger': 'sleep',
+                'source': '*',
+                'dest': 'sleeping',
+                'conditions': 'condition_sleeping',
+                'after': 'publish_state',
+            },
+            { 'trigger': 'charge',
+                'source': ['sleeping', 'running'],
+                'dest': 'charging',
+                'conditions': 'condition_charging',
+                'after': 'publish_state',
+            },
+            { 'trigger': 'run',
+                'source': 'charging',
+                'dest': 'running',
+                'conditions': 'condition_running',
+                'after': 'publish_state',
+            },
+        ]
         self.buses = {}
         self.buses['gpiobus'] = GpioBus(masters=[self], **kwargs)
         self.buses['1wire'] = OnewireBus(masters=[self], **kwargs)
         self.buses['i2c'] = I2CBus(masters=[self], **kwargs)
+        
         self.check_timer = None
  
         timer_delay = kwargs.get('timer_delay', 10)
@@ -182,29 +166,6 @@ class SolarpumpBus(JNTFsmBus):
             help='The delay between 2 checks',
             label='Timer.',
             default=timer_delay,
-        )
-        uuid="{:s}_temperature_freeze".format(OID)
-        self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
-            node_uuid=self.uuid,
-            help='The feezing temperature.',
-            label='Temp Freeze',
-            default=-1,
-        )
-
-        uuid="{:s}_temperature_min".format(OID)
-        self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
-            node_uuid=self.uuid,
-            help='The minimum temperature to restart pumping.',
-            label='Temp Min',
-            default=4,
-        )
-
-        uuid="{:s}_temperature_fan".format(OID)
-        self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
-            node_uuid=self.uuid,
-            help='The minimum temperature to start fans.',
-            label='Temp fan',
-            default=4,
         )
 
         uuid="{:s}_battery_critical".format(OID)
@@ -220,67 +181,71 @@ class SolarpumpBus(JNTFsmBus):
         self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
             node_uuid=self.uuid,
             help='The minimal level for battery.',
-            label='batt min',
+            label='Batt min',
             default=12.5,
             unit='V',
         )
-        pump_delay = kwargs.get('timer_delay', 10)
-        uuid="{:s}_pump_delay".format(OID)
-        self.values[uuid] = self.value_factory['config_integer'](options=self.options, uuid=uuid,
+
+        uuid="{:s}_battery_diff".format(OID)
+        self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
             node_uuid=self.uuid,
-            help='The delay between inverter and pump',
-            label='Delay',
-            default=pump_delay,
+            help='The minimal difference for battery voltage to change state.',
+            label='Batt diff',
+            default=0.2,
+            unit='V',
         )
-        
-        self.thread_start_motor = None
+
         self.thread_fan = None
-
-    @property
-    def sleeping_sensors(self):
-        """The sensors we will poll
-        """
-        return self.booting_sensors.union( set( [
-            self.nodeman.find_value('temperature', 'temperature'),
-            self.nodeman.find_value('temp_battery', 'temperature'),
-            self.nodeman.find_value('led', 'state'),
-            self.nodeman.find_value('ambiancein', 'temperature'),
-            self.nodeman.find_value('ambianceout', 'temperature'),
-            self.nodeman.find_value('ina219', 'power'),
-        ]))
-
-    @property
-    def running_sensors(self):
-        """The sensors we will poll
-        """
-        opt_sensors = []
-        if self.nodeman.find_value('level1', 'state') is not None:
-            opt_sensors = [
-                self.nodeman.find_value('level1', 'state'),
-                self.nodeman.find_value('level2', 'state'),
-            ]
-        if self.nodeman.find_value('fan', 'state') is not None:
-            opt_sensors.append(self.nodeman.find_value('fan', 'state'))
-        if self.nodeman.find_value('fan_battery', 'state') is not None:
-            opt_sensors.append(self.nodeman.find_value('fan_battery', 'state'))
-        return self.sleeping_sensors.union( set( opt_sensors + [
-            self.nodeman.find_value('ambiancein', 'humidity'),
-            self.nodeman.find_value('ambianceout', 'humidity'),
-            self.nodeman.find_value('cpu', 'temperature'),
-            self.nodeman.find_value('cpu', 'voltage'),
-            self.nodeman.find_value('cpu', 'frequency'),
-            self.nodeman.find_value('pump', 'state'),
-            self.nodeman.find_value('inverter', 'state'),
-        ]))
 
     @property
     def booting_sensors(self):
         """The sensors we will poll at boot
         """
-        return set([
-            self.nodeman.find_value('battery', 'voltage'),
-            self.nodeman.find_value('solar', 'voltage'),
-        ])
+        opt_sensors = set()
+        if self.nodeman.find_node('led_error') is not None:
+            opt_sensors.add(self.nodeman.find_value('led_error', 'state'))
+        if self.nodeman.find_node('led') is not None:
+            opt_sensors.add(self.nodeman.find_value('led', 'state'))
+        if self.nodeman.find_node('solar') is not None:
+            opt_sensors.add(self.nodeman.find_value('solar', 'voltage'))
+        opt_sensors.add(self.nodeman.find_value('battery', 'voltage'))
+        return opt_sensors
+
+    @property
+    def sleeping_sensors(self):
+        """The sensors we will poll when sleeping
+        """
+        opt_sensors = set()
+        if self.nodeman.find_node('ina219') is not None:
+            opt_sensors.add(self.nodeman.find_value('ina219', 'power'))
+        return opt_sensors.union( self.booting_sensors )
+
+    @property
+    def charging_sensors(self):
+        """The sensors we will poll when charging
+        """
+        opt_sensors = set()
+        if self.nodeman.find_node('fan') is not None:
+            opt_sensors.add(self.nodeman.find_value('fan', 'state'))
+        if self.nodeman.find_node('fan_battery') is not None:
+            opt_sensors.add(self.nodeman.find_value('fan_battery', 'state'))
+        if self.nodeman.find_node('temp_battery') is not None:
+            opt_sensors.add(self.nodeman.find_value('temp_battery', 'temperature'))
+        if self.nodeman.find_node('ambiancein') is not None:
+            opt_sensors.add(self.nodeman.find_value('ambiancein', 'temperature'))
+        opt_sensors.add(self.nodeman.find_value('cpu', 'temperature'))
+        opt_sensors.add(self.nodeman.find_value('cpu', 'voltage'))
+        return opt_sensors.union( self.sleeping_sensors )
+
+    @property
+    def running_sensors(self):
+        """The sensors we will poll when running
+        """
+        opt_sensors = set()
+        if self.nodeman.find_node('ambiancein') is not None:
+            opt_sensors.add(self.nodeman.find_value('ambiancein', 'humidity'))
+        opt_sensors.add(self.nodeman.find_value('cpu', 'frequency'))
+        return opt_sensors.union( self.charging_sensors )
 
     def condition_booting(self):
         """Return True if all sensors are available
@@ -289,18 +254,25 @@ class SolarpumpBus(JNTFsmBus):
         logger.debug("[%s] - condition_booting sensors : %s", self.__class__.__name__, polled_sensors)
         return all(v is not None for v in polled_sensors)
 
-    def condition_running(self):
-        """Return True if all sensors are available
-        """
-        polled_sensors = self.running_sensors
-        logger.debug("[%s] - condition_running sensors : %s", self.__class__.__name__, polled_sensors)
-        return all(v is not None for v in polled_sensors)
-
     def condition_sleeping(self):
         """Return True if all sensors are available
         """
         polled_sensors = self.sleeping_sensors
         logger.debug("[%s] - condition_sleeping sensors : %s", self.__class__.__name__, polled_sensors)
+        return all(v is not None for v in polled_sensors)
+
+    def condition_charging(self):
+        """Return True if all sensors are available
+        """
+        polled_sensors = self.charging_sensors
+        logger.debug("[%s] - condition_charging sensors : %s", self.__class__.__name__, polled_sensors)
+        return all(v is not None for v in polled_sensors)
+
+    def condition_running(self):
+        """Return True if all sensors are available
+        """
+        polled_sensors = self.running_sensors
+        logger.debug("[%s] - condition_running sensors : %s", self.__class__.__name__, polled_sensors)
         return all(v is not None for v in polled_sensors)
 
     def on_enter_sleeping(self):
@@ -346,7 +318,7 @@ class SolarpumpBus(JNTFsmBus):
         try:
             self.nodeman.remove_polls(self.running_sensors - self.sleeping_sensors)
             self.nodeman.add_polls(self.sleeping_sensors, slow_start=True, overwrite=False)
-            self.nodeman.find_value('led', 'blink').data = 'off'
+            self.nodeman.find_value('led', 'blink').data = 'alert'
         except Exception:
             logger.exception("[%s] - Error in on_enter_booting", self.__class__.__name__)
         finally:
@@ -362,8 +334,9 @@ class SolarpumpBus(JNTFsmBus):
         logger.info("[%s] - on_enter_charging", self.__class__.__name__)
         self.fsm_bus_acquire()
         try:
-            self.nodeman.add_polls(self.sleeping_sensors, slow_start=True, overwrite=False)
-            self.nodeman.find_value('led', 'blink').data = 'off'
+            self.nodeman.remove_polls(self.running_sensors - self.charging_sensors)
+            self.nodeman.add_polls(self.charging_sensors, slow_start=True, overwrite=False)
+            self.nodeman.find_value('led', 'blink').data = 'alert'
         except Exception:
             logger.exception("[%s] - Error in on_enter_charging", self.__class__.__name__)
         finally:
@@ -390,21 +363,178 @@ class SolarpumpBus(JNTFsmBus):
         except Exception:
             logger.exception("[%s] - Error when publishing state", self.__class__.__name__)
 
-    def on_enter_freezing(self):
+    def on_exit_running(self):
         """
         """
-        logger.info("[%s] - on_enter_freezing", self.__class__.__name__)
+        logger.info("[%s] - on_enter_running", self.__class__.__name__)
         self.fsm_bus_acquire()
         try:
-            self.nodeman.find_value('led', 'blink').data = 'notify'
+            self.nodeman.find_value('led', 'blink').data = 'off'
+            self.nodeman.remove_polls(self.running_sensors-self.running_sensors - self.sleeping_sensors)
         except Exception:
-            logger.exception("[%s] - Error in on_enter_freezing", self.__class__.__name__)
+            logger.exception("[%s] - Error in on_enter_running", self.__class__.__name__)
         finally:
             self.fsm_bus_release()
         try:
             self.publish_state()
         except Exception:
             logger.exception("[%s] - Error when publishing state", self.__class__.__name__)
+
+    def stop_check(self):
+        """Check that the component is 'available'
+
+        """
+        if self.check_timer is not None:
+            self.check_timer.cancel()
+            self.check_timer = None
+
+    def start_check(self):
+        """Check that the component is 'available'
+
+        """
+        if self.check_timer is None and self.is_started and self.get_bus_value('timer_delay').data != 0:
+            self.check_timer = threading.Timer(self.get_bus_value('timer_delay').data, self.on_check)
+            self.check_timer.start()
+
+    def on_check(self, **kwargs):
+        """Make a check using a timer.
+
+        """
+        pass
+        
+    def start(self, mqttc, trigger_thread_reload_cb=None, **kwargs):
+        """Start the bus
+        """
+        for bus in self.buses:
+            self.buses[bus].start(mqttc, trigger_thread_reload_cb=None, **kwargs)
+        JNTFsmBus.start(self, mqttc, trigger_thread_reload_cb, **kwargs)
+
+    def stop(self, **kwargs):
+        """Stop the bus
+        """
+        if hasattr(self, "halt"):
+            self.halt()
+        if self.thread_start_motor is not None:
+            self.thread_start_motor.join()
+            self.thread_start_motor = None
+         
+        self.stop_buses(self.buses, **kwargs)
+        JNTFsmBus.stop(self, **kwargs)
+
+    def loop(self, stopevent):
+        """Retrieve data
+        Don't do long task in loop. Use a separated thread to not perturbate the nodeman
+
+        """
+        for bus in self.buses:
+            self.buses[bus].loop(stopevent)
+
+
+class SolarpumpBus(BatteryPoweredBus):
+    """A bus to manage Solarpump
+    """
+
+    """The solarpump states :
+        - sleeping : the power is very low, we do not poll sensors again (except the battery ones, 
+        - charging : power is low. We can poll sensors again.
+        - running : power is ok. We may pump
+            - pumping : the pump is on !!!
+            - freezing : stop pumping !!!
+            - waiting : waiting for water
+    """
+
+
+    def __init__(self, **kwargs):
+        """
+        """
+        BatteryPoweredBus.__init__(self, **kwargs)
+
+        self.transitions.extend( [
+            { 'trigger': 'freeze',
+                'source': '*',
+                'dest': 'running_freezing',
+                'conditions': 'condition_sleeping',
+                'after': 'publish_state',
+            },
+            { 'trigger': 'pump',
+                'source': ['running','charging'],
+                'dest': 'running_pumping',
+                'conditions': 'condition_running',
+                'after': 'publish_state',
+            },
+            { 'trigger': 'wait',
+                'source': ['running','charging'],
+                'dest': 'running_waiting',
+                'conditions': 'condition_running',
+                'after': 'publish_state',
+            },
+        ] )
+        
+        self.states.remove('running')
+        self.states.append( { 'name': 'running',
+            'children': ['freezing','pumping', 'waiting'],
+        } )
+               
+        uuid="{:s}_temperature_freeze".format(OID)
+        self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
+            node_uuid=self.uuid,
+            help='The feezing temperature.',
+            label='Temp Freeze',
+            default=-1,
+        )
+
+        uuid="{:s}_temperature_min".format(OID)
+        self.values[uuid] = self.value_factory['config_float'](options=self.options, uuid=uuid,
+            node_uuid=self.uuid,
+            help='The minimum temperature to restart pumping.',
+            label='Temp Min',
+            default=4,
+        )
+
+        pump_delay = kwargs.get('pump_delay', 10)
+        uuid="{:s}_pump_delay".format(OID)
+        self.values[uuid] = self.value_factory['config_integer'](options=self.options, uuid=uuid,
+            node_uuid=self.uuid,
+            help='The delay between inverter and pump',
+            label='Delay',
+            default=pump_delay,
+        )
+        
+        self.thread_start_motor = None
+
+    @property
+    def sleeping_sensors(self):
+        """The sensors we will poll
+        """
+        opt_sensors = set()
+        opt_sensors.add(self.nodeman.find_value('temperature', 'temperature'))
+        opt_sensors.add(self.nodeman.find_value('ambianceout', 'temperature'))
+        return opt_sensors.union( super(SolarpumpBus, self).sleeping_sensors )
+
+    @property
+    def running_sensors(self):
+        """The sensors we will poll
+        """
+        opt_sensors = set()
+        if self.nodeman.find_node('level1') is not None:
+            opt_sensors.add(self.nodeman.find_value('level1', 'state'))
+            opt_sensors.add(self.nodeman.find_value('level2', 'state'))
+        opt_sensors.add(self.nodeman.find_value('ambianceout', 'humidity'))
+        opt_sensors.add(self.nodeman.find_value('pump', 'state'))
+        opt_sensors.add(self.nodeman.find_value('inverter', 'state'))
+        return opt_sensors.union( super(SolarpumpBus, self).running_sensors)
+
+    def on_enter_running_freezing(self):
+        """
+        """
+        logger.info("[%s] - on_enter_running_freezing", self.__class__.__name__)
+        self.fsm_bus_acquire()
+        try:
+            self.nodeman.find_value('led', 'blink').data = 'notify'
+        except Exception:
+            logger.exception("[%s] - Error in on_enter_running_freezing", self.__class__.__name__)
+        finally:
+            self.fsm_bus_release()
 
     def on_enter_running_pumping(self):
         """ Start the pump system
@@ -462,21 +592,6 @@ class SolarpumpBus(JNTFsmBus):
         except Exception:
             logger.exception("[%s] - Error when publishing state", self.__class__.__name__)
 
-    def stop_check(self):
-        """Check that the component is 'available'
-
-        """
-        if self.check_timer is not None:
-            self.check_timer.cancel()
-            self.check_timer = None
-
-    def start_check(self):
-        """Check that the component is 'available'
-
-        """
-        if self.check_timer is None and self.is_started and self.get_bus_value('timer_delay').data != 0:
-            self.check_timer = threading.Timer(self.get_bus_value('timer_delay').data, self.on_check)
-            self.check_timer.start()
 
     def check_temperatures(self, **kwargs):
         """Make a check using a timer.
@@ -606,33 +721,6 @@ class SolarpumpBus(JNTFsmBus):
         """Stop the pump
         """
         self.thread_start_motor = None
-        
-    def start(self, mqttc, trigger_thread_reload_cb=None, **kwargs):
-        """Start the bus
-        """
-        for bus in self.buses:
-            self.buses[bus].start(mqttc, trigger_thread_reload_cb=None, **kwargs)
-        JNTFsmBus.start(self, mqttc, trigger_thread_reload_cb, **kwargs)
-
-    def stop(self, **kwargs):
-        """Stop the bus
-        """
-        if hasattr(self, "halt"):
-            self.halt()
-        if self.thread_start_motor is not None:
-            self.thread_start_motor.join()
-            self.thread_start_motor = None
-         
-        self.stop_buses(self.buses, **kwargs)
-        JNTFsmBus.stop(self, **kwargs)
-
-    def loop(self, stopevent):
-        """Retrieve data
-        Don't do long task in loop. Use a separated thread to not perturbate the nodeman
-
-        """
-        for bus in self.buses:
-            self.buses[bus].loop(stopevent)
 
 class AmbianceComponent(DHTComponent):
     """ A component for ambiance """
