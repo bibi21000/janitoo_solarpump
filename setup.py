@@ -89,6 +89,7 @@ setup(
                      'janitoo',
                      'janitoo_factory',
                      'janitoo_raspberry',
+                     'janitoo_raspberry_exts',
                      'janitoo_raspberry_gpio',
                      'janitoo_raspberry_dht',
                      'Adafruit-GPIO',
@@ -107,6 +108,7 @@ setup(
     dependency_links = [
       'https://github.com/bibi21000/janitoo/archive/master.zip#egg=janitoo',
       'https://github.com/bibi21000/janitoo_factory/archive/master.zip#egg=janitoo_factory',
+      'https://github.com/bibi21000/janitoo_factory_exts/archive/master.zip#egg=janitoo_factory_exts',
       'https://github.com/bibi21000/janitoo_raspberry_dht/archive/master.zip#egg=janitoo_raspberry_dht',
       'https://github.com/bibi21000/janitoo_raspberry_gpio/archive/master.zip#egg=janitoo_raspberry_gpio',
       'https://github.com/bibi21000/janitoo_raspberry_i2c/archive/master.zip#egg=janitoo_raspberry_i2c',
