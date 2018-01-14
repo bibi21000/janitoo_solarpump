@@ -75,6 +75,10 @@ class TestSolarpumpServer(JNTTServer, JNTTServerCommon):
         self.skipRasperryTest()
         JNTTServerCommon.test_011_start_reload_stop(self)
 
+    def test_020_request_broadcast(self):
+        self.skipRasperryTest()
+        JNTTServerCommon.test_020_request_broadcast(self)
+
     def test_040_server_start_no_error_in_log(self):
         self.onlyRasperryTest()
         JNTTServerCommon.test_040_server_start_no_error_in_log(self)
@@ -124,6 +128,9 @@ class TestDatalogServer(JNTTServer, JNTTServerCommon):
               HADD%(219,4)
               ]
 
+    def test_020_request_broadcast(self):
+        self.skipRasperryTest()
+        JNTTServerCommon.test_020_request_broadcast(self)
 
     def test_040_server_start_no_error_in_log(self):
         self.start()
