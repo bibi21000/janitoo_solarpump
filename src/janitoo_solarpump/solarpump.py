@@ -502,6 +502,14 @@ class SolarpumpBus(BatteryPoweredBus):
         
         self.thread_start_motor = None
 
+    def stop(self, **kwargs):
+        """Stop the bus
+        """
+        if self.thread_start_motor is not None:
+            self.thread_start_motor.join()
+            self.thread_start_motor = None
+        BatteryPoweredBus.stop(self, **kwargs)
+
     @property
     def sleeping_sensors(self):
         """The sensors we will poll

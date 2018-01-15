@@ -174,7 +174,7 @@ class TestSolarpumpThread(JNTTThreadRun, JNTTThreadRunCommon):
         print(allargs)
         self.thread.bus.on_check(**allargs)
         time.sleep(1)
-        self.assertEqual( 'charging', self.thread.bus.state)
+        self.assertEqual( 'running_waiting', self.thread.bus.state)
         #Battery is high, we must wait for the rain
         allargs['battery'] = 13
         print(allargs)
