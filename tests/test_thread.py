@@ -162,6 +162,11 @@ class TestSolarpumpThread(JNTTThreadRun, JNTTThreadRunCommon):
         print(allargs)
         self.thread.bus.on_check(**allargs)
         time.sleep(1)
+        self.assertEqual( 'charging', self.thread.bus.state)
+        allargs['battery'] = 13
+        print(allargs)
+        self.thread.bus.on_check(**allargs)
+        time.sleep(1)
         self.assertEqual( 'running_freezing', self.thread.bus.state)
         #Temp is high, we must wait for the sun
         allargs['temp1'] = 14
