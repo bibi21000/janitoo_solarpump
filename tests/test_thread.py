@@ -100,7 +100,7 @@ class TestSolarpumpThread(JNTTThreadRun, JNTTThreadRunCommon):
         self.thread.bus.sleep()
         time.sleep(2)
         self.thread.bus.charge()
-        time.sleep(2)
+        time.sleep(3)
         self.thread.bus.run()
         time.sleep(2)
         self.thread.bus.pump()
