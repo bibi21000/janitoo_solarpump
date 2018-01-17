@@ -99,7 +99,7 @@ def make_http_resource(**kwargs):
 #~ def make_proximity(**kwargs):
     #~ return ProximityComponent(**kwargs)
 
-class BatteryPoweredBus(JNTFsmBus):
+class OffGridBus(JNTFsmBus):
     """A bus to manage Solar/Wind powered systems. It use a state machine to manage : boot, charge, sleep and running states.
     """
 
@@ -430,7 +430,7 @@ class BatteryPoweredBus(JNTFsmBus):
             self.buses[bus].loop(stopevent)
 
 
-class SolarpumpBus(BatteryPoweredBus):
+class SolarpumpBus(OffGridBus):
     """A bus to manage Solarpump
     """
 
@@ -447,7 +447,7 @@ class SolarpumpBus(BatteryPoweredBus):
     def __init__(self, **kwargs):
         """
         """
-        BatteryPoweredBus.__init__(self, **kwargs)
+        OffGridBus.__init__(self, **kwargs)
 
         self.transitions.extend( [
             { 'trigger': 'freeze',
@@ -508,7 +508,7 @@ class SolarpumpBus(BatteryPoweredBus):
         if self.thread_start_motor is not None:
             self.thread_start_motor.join()
             self.thread_start_motor = None
-        BatteryPoweredBus.stop(self, **kwargs)
+        OffGridBus.stop(self, **kwargs)
 
     @property
     def sleeping_sensors(self):
