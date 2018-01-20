@@ -127,6 +127,7 @@ class TestDatalogServer(JNTTServer, JNTTServerCommon):
     def test_040_server_start_no_error_in_log(self):
         self.start()
         time.sleep(5)
+        self.waitThreads(['datarrd', "http", 'hostsensor'])
         for th in ['datarrd', "http", 'hostsensor']:
             print("Look for thread %s"%th)
             thread = self.server.find_thread(th)
