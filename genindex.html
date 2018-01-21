@@ -152,7 +152,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/index.html#janitoo_solarpump.solarpump.LedComponent.blink_on">blink_on() (janitoo_solarpump.solarpump.LedComponent method)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.booting_sensors">booting_sensors (janitoo_solarpump.solarpump.SolarpumpBus attribute)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.booting_sensors">booting_sensors (janitoo_solarpump.solarpump.OffGridBus attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -160,6 +160,8 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.charging_sensors">charging_sensors (janitoo_solarpump.solarpump.OffGridBus attribute)</a>
+</li>
       <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.check_battery">check_battery() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
 </li>
       <li><a href="api/index.html#janitoo_solarpump.solarpump.HttpResourceComponent.check_heartbeat">check_heartbeat() (janitoo_solarpump.solarpump.HttpResourceComponent method)</a>
@@ -172,11 +174,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/index.html#janitoo_solarpump.solarpump.ClockComponent">ClockComponent (class in janitoo_solarpump.solarpump)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.condition_booting">condition_booting() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.condition_booting">condition_booting() (janitoo_solarpump.solarpump.OffGridBus method)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.condition_running">condition_running() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.condition_charging">condition_charging() (janitoo_solarpump.solarpump.OffGridBus method)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.condition_sleeping">condition_sleeping() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.condition_running">condition_running() (janitoo_solarpump.solarpump.OffGridBus method)</a>
+</li>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.condition_sleeping">condition_sleeping() (janitoo_solarpump.solarpump.OffGridBus method)</a>
 </li>
       <li><a href="api/index.html#janitoo_solarpump.solarpump.CpuComponent">CpuComponent (class in janitoo_solarpump.solarpump)</a>
 </li>
@@ -244,7 +248,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.loop">loop() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.loop">loop() (janitoo_solarpump.solarpump.OffGridBus method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -282,25 +286,33 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_check">on_check() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus">OffGridBus (class in janitoo_solarpump.solarpump)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_booting">on_enter_booting() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.on_check">on_check() (janitoo_solarpump.solarpump.OffGridBus method)</a>
+
+      <ul>
+        <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_check">(janitoo_solarpump.solarpump.SolarpumpBus method)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_charging">on_enter_charging() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      </ul></li>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.on_enter_booting">on_enter_booting() (janitoo_solarpump.solarpump.OffGridBus method)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_freezing">on_enter_freezing() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.on_enter_charging">on_enter_charging() (janitoo_solarpump.solarpump.OffGridBus method)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_halted">on_enter_halted() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.on_enter_halted">on_enter_halted() (janitoo_solarpump.solarpump.OffGridBus method)</a>
+</li>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.on_enter_running">on_enter_running() (janitoo_solarpump.solarpump.OffGridBus method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_running">on_enter_running() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_running_freezing">on_enter_running_freezing() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
 </li>
       <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_running_pumping">on_enter_running_pumping() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
 </li>
       <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_running_waiting">on_enter_running_waiting() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_sleeping">on_enter_sleeping() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.on_enter_sleeping">on_enter_sleeping() (janitoo_solarpump.solarpump.OffGridBus method)</a>
+</li>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.on_exit_running">on_exit_running() (janitoo_solarpump.solarpump.OffGridBus method)</a>
 </li>
       <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.on_exit_running_pumping">on_exit_running_pumping() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
 </li>
@@ -316,25 +328,33 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.running_sensors">running_sensors (janitoo_solarpump.solarpump.SolarpumpBus attribute)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.running_sensors">running_sensors (janitoo_solarpump.solarpump.OffGridBus attribute)</a>
+
+      <ul>
+        <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.running_sensors">(janitoo_solarpump.solarpump.SolarpumpBus attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.sleeping_sensors">sleeping_sensors (janitoo_solarpump.solarpump.SolarpumpBus attribute)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.sleeping_sensors">sleeping_sensors (janitoo_solarpump.solarpump.OffGridBus attribute)</a>
+
+      <ul>
+        <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.sleeping_sensors">(janitoo_solarpump.solarpump.SolarpumpBus attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus">SolarpumpBus (class in janitoo_solarpump.solarpump)</a>
 </li>
       <li><a href="api/index.html#janitoo_solarpump.server.SolarpumpServer">SolarpumpServer (class in janitoo_solarpump.server)</a>
 </li>
       <li><a href="api/index.html#janitoo_solarpump.thread_solarpump.SolarpumpThread">SolarpumpThread (class in janitoo_solarpump.thread_solarpump)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.start">start() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.start">start() (janitoo_solarpump.solarpump.OffGridBus method)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.start_check">start_check() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.start_check">start_check() (janitoo_solarpump.solarpump.OffGridBus method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -342,11 +362,15 @@
 </li>
       <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.start_pump">start_pump() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.states">states (janitoo_solarpump.solarpump.SolarpumpBus attribute)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.states">states (janitoo_solarpump.solarpump.OffGridBus attribute)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.stop">stop() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.stop">stop() (janitoo_solarpump.solarpump.OffGridBus method)</a>
+
+      <ul>
+        <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.stop">(janitoo_solarpump.solarpump.SolarpumpBus method)</a>
 </li>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.stop_check">stop_check() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
+      </ul></li>
+      <li><a href="api/index.html#janitoo_solarpump.solarpump.OffGridBus.stop_check">stop_check() (janitoo_solarpump.solarpump.OffGridBus method)</a>
 </li>
       <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.stop_inverter">stop_inverter() (janitoo_solarpump.solarpump.SolarpumpBus method)</a>
 </li>
@@ -359,10 +383,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/index.html#janitoo_solarpump.solarpump.TemperatureComponent">TemperatureComponent (class in janitoo_solarpump.solarpump)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/index.html#janitoo_solarpump.solarpump.SolarpumpBus.transitions">transitions (janitoo_solarpump.solarpump.SolarpumpBus attribute)</a>
 </li>
   </ul></td>
 </tr></table>

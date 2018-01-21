@@ -221,6 +221,139 @@
 </dd></dl>
 
 <dl class="class">
+<dt id="janitoo_solarpump.solarpump.OffGridBus">
+<em class="property">class </em><code class="descclassname">janitoo_solarpump.solarpump.</code><code class="descname">OffGridBus</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">janitoo_factory.buses.fsm.JNTFsmBus</span></code></p>
+<p>A bus to manage Solar/Wind powered systems. It use a state machine to manage : boot, charge, sleep and running states.</p>
+<dl class="attribute">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.booting_sensors">
+<code class="descname">booting_sensors</code><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.booting_sensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sensors we will poll at boot</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.charging_sensors">
+<code class="descname">charging_sensors</code><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.charging_sensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sensors we will poll when charging</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.condition_booting">
+<code class="descname">condition_booting</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.condition_booting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.condition_booting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if all sensors are available</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.condition_charging">
+<code class="descname">condition_charging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.condition_charging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.condition_charging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if all sensors are available</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.condition_running">
+<code class="descname">condition_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.condition_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.condition_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if all sensors are available</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.condition_sleeping">
+<code class="descname">condition_sleeping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.condition_sleeping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.condition_sleeping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True if all sensors are available</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.loop">
+<code class="descname">loop</code><span class="sig-paren">(</span><em>stopevent</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve data
+Don&#8217;t do long task in loop. Use a separated thread to not perturbate the nodeman</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.on_check">
+<code class="descname">on_check</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.on_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.on_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a check using a timer.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.on_enter_booting">
+<code class="descname">on_enter_booting</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.on_enter_booting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.on_enter_booting" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.on_enter_charging">
+<code class="descname">on_enter_charging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.on_enter_charging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.on_enter_charging" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.on_enter_halted">
+<code class="descname">on_enter_halted</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.on_enter_halted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.on_enter_halted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.on_enter_running">
+<code class="descname">on_enter_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.on_enter_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.on_enter_running" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.on_enter_sleeping">
+<code class="descname">on_enter_sleeping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.on_enter_sleeping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.on_enter_sleeping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.on_exit_running">
+<code class="descname">on_exit_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.on_exit_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.on_exit_running" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.running_sensors">
+<code class="descname">running_sensors</code><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.running_sensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sensors we will poll when running</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.sleeping_sensors">
+<code class="descname">sleeping_sensors</code><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.sleeping_sensors" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sensors we will poll when sleeping</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>mqttc</em>, <em>trigger_thread_reload_cb=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the bus</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.start_check">
+<code class="descname">start_check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.start_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.start_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the component is &#8216;available&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.states">
+<code class="descname">states</code><em class="property"> = None</em><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.states" title="Permalink to this definition">¶</a></dt>
+<dd><p>The solarpump states :
+- booting : the system starts.
+- halted : the system is halted.
+- sleeping : the power is very low, we do not poll sensors again (except the battery ones).
+- charging : power is low. We can poll sensors again.
+- running : power is ok. We may run</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop the bus</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="janitoo_solarpump.solarpump.OffGridBus.stop_check">
+<code class="descname">stop_check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OffGridBus.stop_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OffGridBus.stop_check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the component is &#8216;available&#8217;</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="janitoo_solarpump.solarpump.OutputComponent">
 <em class="property">class </em><code class="descclassname">janitoo_solarpump.solarpump.</code><code class="descname">OutputComponent</code><span class="sig-paren">(</span><em>bus=None</em>, <em>addr=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#OutputComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.OutputComponent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">janitoo_raspberry_gpio.gpio.OutputComponent</span></code></p>
@@ -230,14 +363,8 @@
 <dl class="class">
 <dt id="janitoo_solarpump.solarpump.SolarpumpBus">
 <em class="property">class </em><code class="descclassname">janitoo_solarpump.solarpump.</code><code class="descname">SolarpumpBus</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">janitoo_factory.buses.fsm.JNTFsmBus</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="#janitoo_solarpump.solarpump.OffGridBus" title="janitoo_solarpump.solarpump.OffGridBus"><code class="xref py py-class docutils literal"><span class="pre">janitoo_solarpump.solarpump.OffGridBus</span></code></a></p>
 <p>A bus to manage Solarpump</p>
-<dl class="attribute">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.booting_sensors">
-<code class="descname">booting_sensors</code><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.booting_sensors" title="Permalink to this definition">¶</a></dt>
-<dd><p>The sensors we will poll at boot</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="janitoo_solarpump.solarpump.SolarpumpBus.check_battery">
 <code class="descname">check_battery</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.check_battery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.check_battery" title="Permalink to this definition">¶</a></dt>
@@ -257,59 +384,14 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.condition_booting">
-<code class="descname">condition_booting</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.condition_booting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.condition_booting" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return True if all sensors are available</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.condition_running">
-<code class="descname">condition_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.condition_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.condition_running" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return True if all sensors are available</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.condition_sleeping">
-<code class="descname">condition_sleeping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.condition_sleeping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.condition_sleeping" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return True if all sensors are available</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.loop">
-<code class="descname">loop</code><span class="sig-paren">(</span><em>stopevent</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve data
-Don&#8217;t do long task in loop. Use a separated thread to not perturbate the nodeman</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="janitoo_solarpump.solarpump.SolarpumpBus.on_check">
 <code class="descname">on_check</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.on_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.on_check" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make a check using a timer.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.on_enter_booting">
-<code class="descname">on_enter_booting</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.on_enter_booting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_booting" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.on_enter_charging">
-<code class="descname">on_enter_charging</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.on_enter_charging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_charging" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.on_enter_freezing">
-<code class="descname">on_enter_freezing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.on_enter_freezing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_freezing" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.on_enter_halted">
-<code class="descname">on_enter_halted</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.on_enter_halted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_halted" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.on_enter_running">
-<code class="descname">on_enter_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.on_enter_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_running" title="Permalink to this definition">¶</a></dt>
+<dt id="janitoo_solarpump.solarpump.SolarpumpBus.on_enter_running_freezing">
+<code class="descname">on_enter_running_freezing</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.on_enter_running_freezing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_running_freezing" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -323,11 +405,6 @@ Don&#8217;t do long task in loop. Use a separated thread to not perturbate the n
 <code class="descname">on_enter_running_waiting</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.on_enter_running_waiting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_running_waiting" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start the pump system</p>
 </dd></dl>
-
-<dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.on_enter_sleeping">
-<code class="descname">on_enter_sleeping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.on_enter_sleeping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.on_enter_sleeping" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 <dl class="method">
 <dt id="janitoo_solarpump.solarpump.SolarpumpBus.on_exit_running_pumping">
@@ -348,18 +425,6 @@ Don&#8217;t do long task in loop. Use a separated thread to not perturbate the n
 </dd></dl>
 
 <dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.start">
-<code class="descname">start</code><span class="sig-paren">(</span><em>mqttc</em>, <em>trigger_thread_reload_cb=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.start" title="Permalink to this definition">¶</a></dt>
-<dd><p>Start the bus</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.start_check">
-<code class="descname">start_check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.start_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.start_check" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that the component is &#8216;available&#8217;</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="janitoo_solarpump.solarpump.SolarpumpBus.start_inverter">
 <code class="descname">start_inverter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.start_inverter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.start_inverter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start the inverter</p>
@@ -371,32 +436,10 @@ Don&#8217;t do long task in loop. Use a separated thread to not perturbate the n
 <dd><p>Start the pump</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.states">
-<code class="descname">states</code><em class="property"> = ['booting', 'halted', 'sleeping', 'charging', 'freezing', {'name': 'running', 'children': ['pumping', 'waiting']}]</em><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.states" title="Permalink to this definition">¶</a></dt>
-<dd><p>The solarpump states :
-- sleeping : the power is very low, we do not poll sensors again (except the battery ones,
-- charging : power is low. We can poll sensors again.
-- running : power is ok. We may pump</p>
-<blockquote>
-<div><ul class="simple">
-<li>pumping : the pump is on !!!</li>
-<li>freezing : stop pumping !!!</li>
-<li>waiting : waiting for water</li>
-</ul>
-</div></blockquote>
-</dd></dl>
-
 <dl class="method">
 <dt id="janitoo_solarpump.solarpump.SolarpumpBus.stop">
 <code class="descname">stop</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.stop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stop the bus</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.stop_check">
-<code class="descname">stop_check</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.stop_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.stop_check" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that the component is &#8216;available&#8217;</p>
 </dd></dl>
 
 <dl class="method">
@@ -410,11 +453,6 @@ Don&#8217;t do long task in loop. Use a separated thread to not perturbate the n
 <code class="descname">stop_pump</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/janitoo_solarpump/solarpump.html#SolarpumpBus.stop_pump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.stop_pump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stop the pump</p>
 </dd></dl>
-
-<dl class="attribute">
-<dt id="janitoo_solarpump.solarpump.SolarpumpBus.transitions">
-<code class="descname">transitions</code><em class="property"> = [{'dest': 'sleeping', 'source': 'booting', 'trigger': 'boot', 'conditions': 'condition_booting'}, {'dest': 'halted', 'source': '*', 'trigger': 'halted'}, {'dest': 'sleeping', 'source': '*', 'trigger': 'sleep', 'conditions': 'condition_sleeping'}, {'dest': 'charging', 'source': '*', 'trigger': 'charge', 'conditions': 'condition_running'}, {'dest': 'freezing', 'source': '*', 'trigger': 'freeze', 'conditions': 'condition_sleeping'}, {'dest': 'running_pumping', 'source': ['running', 'charging'], 'trigger': 'pump', 'conditions': 'condition_running'}, {'dest': 'running', 'source': 'charging', 'trigger': 'run', 'conditions': 'condition_running'}, {'dest': 'running_waiting', 'source': ['running', 'charging'], 'trigger': 'wait', 'conditions': 'condition_running'}]</em><a class="headerlink" href="#janitoo_solarpump.solarpump.SolarpumpBus.transitions" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
