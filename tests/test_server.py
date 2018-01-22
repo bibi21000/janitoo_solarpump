@@ -80,6 +80,7 @@ class TestSolarpumpServer(JNTTServer, JNTTServerCommon):
         JNTTServerCommon.test_040_server_start_no_error_in_log(self)
 
     def test_100_server_start_machine_state(self):
+        self.skipTest()
         self.start()
         self.waitHeartbeatNodes(hadds=self.hadds)
         self.assertFsmBoot()

@@ -95,6 +95,7 @@ class TestSolarpumpThread(JNTTThreadRun, JNTTThreadRunCommon):
         self.assertValueOnBus('ina219','power')
 
     def test_103_state_machine(self):
+        self.skipTest()
         self.wait_for_nodeman()
         time.sleep(2)
         self.thread.bus.sleep()
