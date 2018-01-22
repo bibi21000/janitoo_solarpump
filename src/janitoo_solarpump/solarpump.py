@@ -634,8 +634,8 @@ class SolarpumpBus(OffGridBus):
             temp = ( temp1 + temp2 ) / 2
             if temp < freeze_temp and self.state != 'sleeping':
                 self.freeze()
-            if temp > min_temp and self.state == 'freezing':
-                self.sleep()
+            if temp > min_temp and self.state == 'running_freezing':
+                self.wait()
 
     def check_levels(self, **kwargs):
         """Make a check using a timer.
